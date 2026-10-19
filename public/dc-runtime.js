@@ -76,16 +76,20 @@
     const inst = new Component({});
     let ctx = { handlers: [] };
     let queued = false;
+    let lastScreen = null;
     const draw = () => {
       queued = false;
       ctx = { handlers: [] };
-      const html = '<div id="' + root.id + '">' + kids(tplEl.content ? { tagName: 'template', content: tplEl.content } : tplEl, inst.renderVals(), ctx) + '</div>';
+      const vals = inst.renderVals();
+      const screen = Object.keys(vals).filter(k => /^is[A-Z]/.test(k) && vals[k] === true).join();
+      const html = '<div id="' + root.id + '">' + kids(tplEl.content ? { tagName: 'template', content: tplEl.content } : tplEl, vals, ctx) + '</div>';
       window.morphdom(root, html, {
         onBeforeElUpdated: (from, to) => {
           // keep live animations running when only the class string is unchanged
           return !from.isEqualNode(to);
         }
       });
+      if (screen !== lastScreen) { if (lastScreen !== null) window.scrollTo(0, 0); lastScreen = screen; }
     };
     inst.__schedule = () => { if (!queued) { queued = true; requestAnimationFrame(draw); } };
     ['click', 'input', 'change'].forEach(type => {

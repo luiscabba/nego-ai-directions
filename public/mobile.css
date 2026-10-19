@@ -11,7 +11,7 @@
 
   /* 12-column screen grids stack into one column */
   [style*="grid-template-columns: repeat(12"] { display: flex !important; flex-direction: column !important; gap: 16px !important; }
-  [style*="grid-column: span"] { width: 100% !important; min-width: 0; }
+  [style*="grid-column: span"] { width: 100% !important; min-width: 0; box-sizing: border-box; }
   [style*="grid-template-columns: repeat(2"] { grid-template-columns: 1fr !important; }
   [style*="grid-template-columns: repeat(4"] { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 

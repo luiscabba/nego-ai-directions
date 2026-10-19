@@ -1,0 +1,16 @@
+@font-face{font-family:'Sora';font-weight:400;font-style:normal;src:url('fonts/sora-latin-400-normal.woff2') format('woff2');unicode-range:U+0000-00FF,U+2000-206F,U+2190-21FF}
+@font-face{font-family:'Sora';font-weight:400;font-style:normal;src:url('fonts/sora-latin-ext-400-normal.woff2') format('woff2');unicode-range:U+0100-02FF,U+20A0-20CF,U+2C60-2C7F}
+@font-face{font-family:'Sora';font-weight:500;font-style:normal;src:url('fonts/sora-latin-500-normal.woff2') format('woff2');unicode-range:U+0000-00FF,U+2000-206F,U+2190-21FF}
+@font-face{font-family:'Sora';font-weight:500;font-style:normal;src:url('fonts/sora-latin-ext-500-normal.woff2') format('woff2');unicode-range:U+0100-02FF,U+20A0-20CF,U+2C60-2C7F}
+@font-face{font-family:'Sora';font-weight:600;font-style:normal;src:url('fonts/sora-latin-600-normal.woff2') format('woff2');unicode-range:U+0000-00FF,U+2000-206F,U+2190-21FF}
+@font-face{font-family:'Sora';font-weight:600;font-style:normal;src:url('fonts/sora-latin-ext-600-normal.woff2') format('woff2');unicode-range:U+0100-02FF,U+20A0-20CF,U+2C60-2C7F}
+@font-face{font-family:'Sora';font-weight:700;font-style:normal;src:url('fonts/sora-latin-700-normal.woff2') format('woff2');unicode-range:U+0000-00FF,U+2000-206F,U+2190-21FF}
+@font-face{font-family:'Sora';font-weight:700;font-style:normal;src:url('fonts/sora-latin-ext-700-normal.woff2') format('woff2');unicode-range:U+0100-02FF,U+20A0-20CF,U+2C60-2C7F}
+@font-face{font-family:'Sora';font-weight:800;font-style:normal;src:url('fonts/sora-latin-800-normal.woff2') format('woff2');unicode-range:U+0000-00FF,U+2000-206F,U+2190-21FF}
+@font-face{font-family:'Sora';font-weight:800;font-style:normal;src:url('fonts/sora-latin-ext-800-normal.woff2') format('woff2');unicode-range:U+0100-02FF,U+20A0-20CF,U+2C60-2C7F}
+@font-face{font-family:'JetBrains Mono';font-weight:400;font-style:normal;src:url('fonts/jetbrains-mono-latin-400-normal.woff2') format('woff2');unicode-range:U+0000-00FF,U+2000-206F,U+2190-21FF}
+@font-face{font-family:'JetBrains Mono';font-weight:400;font-style:normal;src:url('fonts/jetbrains-mono-latin-ext-400-normal.woff2') format('woff2');unicode-range:U+0100-02FF,U+20A0-20CF,U+2C60-2C7F}
+@font-face{font-family:'JetBrains Mono';font-weight:500;font-style:normal;src:url('fonts/jetbrains-mono-latin-500-normal.woff2') format('woff2');unicode-range:U+0000-00FF,U+2000-206F,U+2190-21FF}
+@font-face{font-family:'JetBrains Mono';font-weight:500;font-style:normal;src:url('fonts/jetbrains-mono-latin-ext-500-normal.woff2') format('woff2');unicode-range:U+0100-02FF,U+20A0-20CF,U+2C60-2C7F}
+@font-face{font-family:'JetBrains Mono';font-weight:600;font-style:normal;src:url('fonts/jetbrains-mono-latin-600-normal.woff2') format('woff2');unicode-range:U+0000-00FF,U+2000-206F,U+2190-21FF}
+@font-face{font-family:'JetBrains Mono';font-weight:600;font-style:normal;src:url('fonts/jetbrains-mono-latin-ext-600-normal.woff2') format('woff2');unicode-range:U+0100-02FF,U+20A0-20CF,U+2C60-2C7F}

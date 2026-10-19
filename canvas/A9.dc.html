@@ -434,7 +434,7 @@ class Component extends DCLogic {
       scriptTitle: script.t, scriptScenario: script.sc,
       missions: missions.map(m => ({ ...m, cls: 'ms' + (m.done ? ' done' : ''), mark: m.done ? '✓' : '' })), missionsDone: missions.filter(m => m.done).length,
       board: [ { r: 1, n: 'Joy Santiago', s: '2,140', me: false }, { r: 2, n: 'Rica Manalo (you)', s: passed ? '1,980' : '1,860', me: true }, { r: 3, n: 'Paolo Reyes', s: '1,720', me: false }, { r: 4, n: 'Ana Lopez', s: '1,610', me: false } ].map(b => ({ ...b, cls: 'lbr' + (b.me ? ' me' : '') })),
-      upNext: scriptRows.filter(x => x.unlocked && x.label !== 'Cleared' && x.id !== s.script).slice(0, 3),
+      upNext: scriptRows.filter(x => x.label !== 'Cleared' && x.id !== s.script).slice(0, 3),
       banks: this.BANKS.map((b, i) => { const d = b.done + (passed && b.id === 'amihan' ? 1 : 0); return { ...b, label: d + '/' + b.total, pct: Math.round(d / b.total * 100) + '%', d: (i * 0.07) + 's', open: () => this.go('book', { bank: b.id }) }; }),
       scripts: scriptRows,
       steps: this.STEPS.map((p, i) => ({ n: i + 1, t: p.t, cls: 'step' + (i === stepI ? ' on' : ''), pick: () => this.setState({ step: i }) })),

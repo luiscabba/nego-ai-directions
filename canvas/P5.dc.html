@@ -584,7 +584,7 @@ body:has(.gx) .dc-switch{left:50% !important;right:auto !important;bottom:86px !
   </sc-if>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+<script type="text/x-dc" data-dc-script data-props='{"frame":{"editor":"enum","options":["app","home","books","script","hub","lobby","count","live","proc","results","transcript","progress","team","review","closed"],"default":"app"},"$preview":{"width":1440,"height":900}}'>
 class Component extends DCLogic {
   constructor(props) {
     super(props);
@@ -679,13 +679,31 @@ class Component extends DCLogic {
       q: '', filter: 'all', lobbyTab: 'all', tq: '', tfilter: 'all', sel: 'rica', decision: 'approve',
       tk: { rica: 'open', kim: 'review', paolo: 'open', ben: 'open', leo: 'open' }
     };
+    const R = { rica: 'review', kim: 'review', paolo: 'open', ben: 'open', leo: 'open' };
+    const done = { score: 84, passed: true, tk: R };
+    const FRAMES = {
+      home: {}, books: { screen: 'books' }, script: { screen: 'script', step: 2 }, hub: { screen: 'hub' },
+      lobby: { screen: 'lobby', ready: true }, count: { screen: 'count', cd: 3 }, live: { screen: 'live', tick: 9 },
+      proc: { screen: 'proc', pstep: 2, pp: 55 },
+      results: Object.assign({ screen: 'results', ph: 112 }, done),
+      transcript: Object.assign({ screen: 'results', tab: 'transcript', ph: 150, stars: 5, rtags: { Realistic: true, 'Followed brief': true } }, done),
+      progress: { screen: 'progress', passed: true },
+      team: Object.assign({ role: 'tl', screen: 'team' }, done),
+      review: Object.assign({ role: 'tl', screen: 'review', ph: 150 }, done),
+      closed: { role: 'tl', screen: 'team', score: 84, passed: true, tk: Object.assign({}, R, { rica: 'closed' }), toast: 'Ticket closed · Rica notified', toastN: 1 }
+    };
+    const fr = (props && props.frame) || 'app';
+    if (FRAMES[fr]) Object.assign(this.state, FRAMES[fr]);
   }
   componentDidMount() {
-    this.onKey = e => { if (e.key === 'd' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) this.demo(); };
-    document.addEventListener('keydown', this.onKey);
-    if (/[?&]demo/.test(location.search)) setTimeout(() => this.demo(), 600);
+    const site = /\/flows\//.test(location.pathname);
+    if (site && !this.props.frame) {
+      this.onKey = e => { if (e.key === 'd' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) this.demo(); };
+      document.addEventListener('keydown', this.onKey);
+      if (/[?&]demo/.test(location.search)) setTimeout(() => this.demo(), 600);
+    }
   }
-  componentWillUnmount() { this.stop(); this.stopDemo(); }
+  componentWillUnmount() { this.stop(); this.stopDemo(); clearTimeout(this.tt); if (this.onKey) document.removeEventListener('keydown', this.onKey); }
   stop() { clearInterval(this.iv); clearTimeout(this.to); clearInterval(this.pv); this.iv = this.to = this.pv = null; }
   go(screen, extra) {
     this.stop();

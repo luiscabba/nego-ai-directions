@@ -1,0 +1,959 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>07 Live · AI hint</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+body{margin:0;background:#0A1012}
+.demo .dc-switch{display:none !important}
+.demo{cursor:none}
+
+/* ---------- tokens ---------- */
+.gx{
+  --bg:#0A1012;--panel:#0F1A1C;
+  --ink:#E6F0EE;--ink-2:#C3D2CF;--mute:#9FB3AF;--faint:#6F827E;
+  --teal:#7FE3C0;--teal-d:#3FB68B;--teal-ink:#06231A;
+  --amber:#F2C287;--amber-2:#F2D3A8;--blue:#A9C1FF;--red:#F0705A;
+  --glass:rgba(255,255,255,.055);--glass-hi:rgba(255,255,255,.085);
+  --line:rgba(255,255,255,.12);--line-2:rgba(255,255,255,.07);
+  --r-s:12px;--r-m:18px;--r-l:24px;--r-p:999px;
+  --sans:Sora,system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace;
+  --t-display:38px;--t-h1:30px;--t-h2:15px;--t-body:14px;--t-sm:12px;--t-lbl:11px;
+  --ease:cubic-bezier(.16,1,.3,1);
+  position:relative;overflow:hidden;min-height:900px;display:flex;
+  font-family:var(--sans);font-size:var(--t-body);color:var(--ink);background:var(--bg)
+}
+.gx *{box-sizing:border-box}
+.blob{position:absolute;border-radius:50%;pointer-events:none}
+.mono{font-family:var(--mono)}
+.lbl{font-family:var(--mono);font-size:var(--t-lbl);letter-spacing:.08em;color:var(--mute);text-transform:uppercase}
+.muted{color:var(--mute)}.faint{color:var(--faint)}
+.num{font-variant-numeric:tabular-nums}
+
+/* ---------- surfaces ---------- */
+.g{background:var(--glass);border:1px solid var(--line);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 24px 60px rgba(0,0,0,.28);backdrop-filter:blur(28px) saturate(160%);-webkit-backdrop-filter:blur(28px) saturate(160%)}
+.g.hi{background:var(--glass-hi);border-color:rgba(127,227,192,.36)}
+.g.warm{background:rgba(242,194,135,.07);border-color:rgba(242,194,135,.24)}
+.rl{border-radius:var(--r-l)}.rm{border-radius:var(--r-m)}
+.card{padding:24px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.h1{margin:0;font-size:var(--t-h1);line-height:1.1;font-weight:600;letter-spacing:-.02em;text-wrap:balance}
+.h1.xl{font-size:var(--t-display)}
+.h2{margin:0;font-size:var(--t-h2);font-weight:600}
+
+/* ---------- icon ---------- */
+.ic{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.ic.f{fill:currentColor;stroke:none}
+.ic.lg{width:22px;height:22px}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid transparent;font:inherit;font-weight:600;font-size:14px;padding:12px 20px;border-radius:var(--r-p);cursor:pointer;color:var(--ink);transition:transform .15s var(--ease),box-shadow .2s,background .2s,border-color .2s;white-space:nowrap}
+.btn .ic{width:16px;height:16px}
+.btn:focus-visible,.tab:focus-visible,.nav:focus-visible,.chipb:focus-visible,.star:focus-visible,.inp:focus-visible,.icbtn:focus-visible{outline:2px solid var(--teal);outline-offset:3px}
+.btn:active,.demo-press{transform:scale(.96)}
+.demo-press{box-shadow:0 0 0 4px rgba(127,227,192,.35) !important}
+.btn.pri{background:linear-gradient(140deg,var(--teal),var(--teal-d));color:var(--teal-ink);box-shadow:0 10px 30px rgba(63,182,139,.3)}
+.btn.pri:hover{box-shadow:0 12px 36px rgba(63,182,139,.45)}
+.btn.sec{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.15)}
+.btn.sec:hover{background:rgba(255,255,255,.11)}
+.btn.ghost{background:transparent;color:var(--mute)}.btn.ghost:hover{color:var(--ink)}
+.btn.bad{background:var(--red);color:#fff}
+.btn.sm{padding:8px 14px;font-size:13px}
+.btn.lg{padding:15px 30px;font-size:16px}
+.btn[disabled]{opacity:.4;pointer-events:none}
+.icbtn{width:44px;height:44px;border-radius:50%;border:0;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;background:linear-gradient(140deg,var(--teal),var(--teal-d));color:var(--teal-ink);flex:none;transition:transform .15s var(--ease)}
+.icbtn:active{transform:scale(.94)}
+
+/* ---------- pills ---------- */
+.pill{display:inline-flex;align-items:center;gap:7px;padding:5px 10px;border-radius:var(--r-p);font-family:var(--mono);font-size:var(--t-lbl);letter-spacing:.02em;background:rgba(255,255,255,.07);color:var(--mute);white-space:nowrap;justify-self:start}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.pill.ok{background:rgba(127,227,192,.13);color:var(--teal)}
+.pill.amb{background:rgba(242,194,135,.13);color:var(--amber)}
+.pill.info{background:rgba(110,150,240,.17);color:var(--blue)}
+.pill.bad{background:rgba(240,112,90,.15);color:#F59C86}
+.pill.live::before{animation:blink 1s steps(2) infinite}
+
+/* ---------- inputs, filters, tabs ---------- */
+.search{display:flex;align-items:center;gap:10px;padding:0 14px;height:42px;border-radius:var(--r-p);background:rgba(255,255,255,.05);border:1px solid var(--line-2);color:var(--mute);min-width:0;flex:1;max-width:320px;transition:border-color .2s}
+.search:focus-within{border-color:rgba(127,227,192,.5)}
+.inp{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:14px;color:var(--ink);outline:none}
+.inp::placeholder{color:var(--faint)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chipb{border:1px solid var(--line-2);background:transparent;font:inherit;font-size:13px;color:var(--mute);padding:8px 13px;border-radius:var(--r-p);cursor:pointer;display:inline-flex;gap:7px;align-items:center;transition:background .2s,color .2s,border-color .2s}
+.chipb:hover{color:var(--ink)}
+.chipb.on{background:rgba(127,227,192,.13);border-color:rgba(127,227,192,.34);color:var(--teal)}
+.chipb b{font-family:var(--mono);font-weight:500;font-size:11px;opacity:.8}
+.seg{display:inline-flex;padding:4px;border-radius:var(--r-p);gap:2px}
+.tab{border:0;font:inherit;font-size:13px;font-weight:500;padding:8px 15px;border-radius:var(--r-p);background:transparent;color:var(--mute);cursor:pointer;transition:background .25s var(--ease),color .2s}
+.tab.on{background:rgba(255,255,255,.13);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+
+/* ---------- table ---------- */
+.tbl{display:flex;flex-direction:column;gap:4px}
+.th,.tr{display:grid;grid-template-columns:var(--cols);gap:14px;align-items:center;padding:0 16px}
+.th{padding-bottom:6px;border-bottom:1px solid var(--line-2);margin-bottom:4px}
+.th span{font-family:var(--mono);font-size:var(--t-lbl);letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.tr{padding:13px 16px;border-radius:14px;background:rgba(255,255,255,.03);transition:background .2s}
+.tr:hover{background:rgba(255,255,255,.065)}
+.tr.sel{background:rgba(127,227,192,.09);box-shadow:inset 0 0 0 1px rgba(127,227,192,.28)}
+.cell2{display:flex;flex-direction:column;gap:2px;min-width:0}
+.cell2>span:first-child{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cell2>span:last-child{font-size:12px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.act{display:flex;gap:6px;justify-content:flex-end}
+.empty{padding:28px;text-align:center;color:var(--faint);font-size:13px}
+
+/* ---------- toast ---------- */
+.toast{position:fixed;left:50%;bottom:32px;z-index:60;display:flex;align-items:center;gap:12px;padding:12px 18px 12px 12px;border-radius:var(--r-p);background:rgba(16,30,30,.88);border:1px solid rgba(127,227,192,.35);box-shadow:0 20px 50px rgba(0,0,0,.45);backdrop-filter:blur(20px);font-size:14px;font-weight:500;animation:toast .5s var(--ease) both}
+.toast i{width:30px;height:30px;border-radius:50%;background:var(--teal);color:var(--teal-ink);display:flex;align-items:center;justify-content:center}
+
+/* ---------- shell ---------- */
+.rail{position:relative;flex:0 0 88px;margin:20px 0 20px 20px;border-radius:26px;padding:16px 0;display:flex;flex-direction:column;align-items:center;gap:6px;z-index:2}
+.logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(140deg,#5FE0B4,#2A9D7C);color:var(--teal-ink);font-weight:700;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.nav{width:72px;border:0;background:transparent;color:var(--mute);font:inherit;font-size:11px;font-weight:500;padding:10px 0;border-radius:16px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:background .2s,color .2s}
+.nav:hover{color:var(--ink)}
+.nav .ic{width:20px;height:20px}
+.nav.on{background:rgba(127,227,192,.14);color:var(--teal)}
+.main{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;z-index:1}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:22px 28px 0;flex-wrap:wrap}
+.who{display:flex;align-items:center;gap:12px;font-size:14px}
+.scr{flex:1;padding:20px 28px 40px;display:flex;flex-direction:column;gap:18px}
+.row{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:18px}
+.c3{grid-column:span 3}.c4{grid-column:span 4}.c5{grid-column:span 5}.c6{grid-column:span 6}.c7{grid-column:span 7}.c8{grid-column:span 8}.c9{grid-column:span 9}.c12{grid-column:span 12}
+.stack{display:flex;flex-direction:column;gap:18px;min-width:0}
+
+/* ---------- data bits ---------- */
+.bars{position:relative;display:flex;gap:10px;align-items:flex-end}
+.bars .pass{position:absolute;left:0;right:0;bottom:80%;border-top:1px dashed rgba(127,227,192,.55)}
+.tb{flex:1;border-radius:8px 8px 2px 2px;background:rgba(255,255,255,.13)}
+.tb.on{background:linear-gradient(180deg,var(--teal),#2A9D7C);box-shadow:0 0 24px rgba(127,227,192,.3)}
+.meter{height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}
+.meter>div{height:6px;background:linear-gradient(90deg,var(--teal),#2A9D7C)}
+.spark{display:flex;gap:3px;align-items:flex-end;height:26px}
+.spark i{width:6px;border-radius:2px;background:rgba(255,255,255,.18)}
+.spark i.on{background:var(--teal)}
+.kpi{padding:18px 20px;display:flex;flex-direction:column;gap:6px}
+.kpi .v{font-size:28px;font-weight:600;letter-spacing:-.02em}
+.kpi .d{font-size:12px;color:var(--teal)}
+.kpi .d.w{color:var(--amber)}
+.av{width:36px;height:36px;border-radius:50%;background:rgba(127,227,192,.13);border:1px solid rgba(127,227,192,.3);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;color:var(--teal);flex:none}
+.av.lg{width:44px;height:44px;font-size:14px}
+.person{display:flex;align-items:center;gap:12px;min-width:0}
+.ring{border-radius:50%;display:flex;align-items:center;justify-content:center;transition:box-shadow .4s}
+.bk{text-align:left;width:100%;border:1px solid transparent;background:transparent;font:inherit;color:inherit;cursor:pointer;padding:13px 15px;border-radius:16px;display:flex;justify-content:space-between;align-items:center;gap:10px;transition:background .2s}
+.bk:hover{background:rgba(255,255,255,.05)}
+.bk.on{background:rgba(127,227,192,.1);border-color:rgba(127,227,192,.3)}
+.step{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:center;border:0;background:transparent;font:inherit;color:var(--faint);text-align:left;cursor:pointer;padding:10px 12px;border-radius:14px}
+.step b{font-family:var(--mono);font-weight:500;font-size:12px}
+.step.on{color:var(--ink);background:rgba(127,227,192,.1)}.step.on b{color:var(--teal)}
+.pt{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;font-size:14px;border:1px solid var(--line-2);background:rgba(255,255,255,.03);transition:background .4s,border-color .4s,color .4s}
+.pt .dot{width:20px;height:20px;border-radius:50%;border:1.5px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex:none;color:var(--teal-ink)}
+.pt .dot .ic{width:12px;height:12px;stroke-width:3}
+.pt.met{background:rgba(127,227,192,.1);border-color:rgba(127,227,192,.24)}
+.pt.met .dot{background:var(--teal);border-color:var(--teal)}
+.pt.now{background:rgba(255,255,255,.09);border-color:rgba(127,227,192,.55)}
+.pt.now .dot{border-color:var(--teal);box-shadow:0 0 0 4px rgba(127,227,192,.18)}
+.pt.todo{color:var(--faint)}
+.pt .t{flex:1}
+.pt .tm{font-family:var(--mono);font-size:11px;color:var(--teal)}
+.ln{display:grid;grid-template-columns:56px 1fr;gap:12px;font-size:14px;line-height:1.55;padding:8px 10px;border-radius:12px;transition:background .3s,color .3s;color:var(--ink-2)}
+.ln .wh{font-weight:600;margin-right:6px}
+.ln.a .wh{color:var(--teal)}.ln.d .wh{color:var(--amber)}
+.ln.cur{background:rgba(255,255,255,.07);color:var(--ink)}
+.ln.past{color:var(--ink-2)}.ln.future{color:var(--faint)}
+
+/* ---------- player ---------- */
+.player{display:flex;align-items:center;gap:16px;padding:14px 18px 14px 14px}
+.scrub{position:relative;flex:1;height:36px;cursor:pointer;min-width:0}
+.scrub .segs{position:absolute;left:0;right:0;top:9px;height:18px;display:flex;gap:2px;border-radius:6px;overflow:hidden}
+.scrub .played{position:absolute;left:0;top:9px;height:18px;border-radius:6px 0 0 6px;background:rgba(255,255,255,.18);mix-blend-mode:screen;pointer-events:none}
+.scrub .head{position:absolute;top:2px;width:2px;height:32px;margin-left:-1px;background:#fff;border-radius:1px;box-shadow:0 0 12px rgba(255,255,255,.7);pointer-events:none}
+.scrub .mk{position:absolute;top:30px;width:6px;height:6px;margin-left:-3px;border-radius:50%}
+.mk.met{background:var(--teal)}.mk.late{background:var(--amber)}
+
+/* ---------- live ---------- */
+.stage{padding:30px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.spk{display:flex;flex-direction:column;align-items:center;gap:10px}
+.wv{flex:1;display:flex;gap:3px;align-items:center;justify-content:center;height:80px;min-width:0;overflow:hidden}
+.wv i{flex:none;width:4px;border-radius:2px;transition:background .4s}
+.hint{display:flex;gap:14px;align-items:flex-start;padding:18px 20px;border-radius:var(--r-m);background:linear-gradient(120deg,rgba(127,227,192,.14),rgba(110,150,240,.1));border:1px solid rgba(127,227,192,.38);box-shadow:0 0 40px rgba(127,227,192,.12);animation:hint .55s var(--ease) both}
+.hint .sp{width:36px;height:36px;border-radius:12px;background:rgba(127,227,192,.18);color:var(--teal);display:flex;align-items:center;justify-content:center;flex:none}
+.hint .say{font-size:16px;font-weight:500;margin-top:4px}
+
+/* ---------- countdown ---------- */
+.cd{position:relative;width:260px;height:260px;display:flex;align-items:center;justify-content:center}
+.cd svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.cd circle{fill:none;stroke-width:4}
+.cd .trk{stroke:rgba(255,255,255,.08)}
+.cd .arc{stroke:var(--teal);stroke-linecap:round;stroke-dasharray:779;animation:arc .8s linear both;filter:drop-shadow(0 0 10px rgba(127,227,192,.6))}
+.cd .n{font-size:120px;font-weight:600;letter-spacing:-.04em;line-height:1;animation:cdpop .8s var(--ease) both}
+.cd .go{font-size:54px;font-weight:600;color:var(--teal);animation:cdpop .5s var(--ease) both}
+
+/* ---------- pipeline ---------- */
+.pipe{width:min(600px,100%);padding:30px;display:flex;flex-direction:column;gap:10px}
+.ps{display:grid;grid-template-columns:40px 1fr 70px;gap:14px;align-items:center;padding:14px 16px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid transparent;transition:background .4s,border-color .4s,opacity .4s}
+.ps.wait{opacity:.45}
+.ps.run{background:rgba(255,255,255,.07);border-color:rgba(127,227,192,.35)}
+.ps .pi{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;color:var(--mute);transition:background .4s,color .4s}
+.ps.run .pi{background:rgba(127,227,192,.16);color:var(--teal)}
+.ps.done .pi{background:var(--teal);color:var(--teal-ink)}
+.ps .pm{height:4px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:8px}
+.ps .pm div{height:4px;background:linear-gradient(90deg,var(--teal),var(--blue));transition:width .08s linear}
+.ps .pr{font-family:var(--mono);font-size:12px;text-align:right;color:var(--mute)}
+.ps.done .pr{color:var(--teal)}
+
+/* ---------- rating ---------- */
+.stars{display:flex;gap:6px}
+.star{border:0;background:transparent;padding:2px;cursor:pointer;color:rgba(255,255,255,.2);transition:color .2s,transform .2s var(--ease)}
+.star .ic{width:28px;height:28px}
+.star.on{color:var(--amber)}
+.star:active{transform:scale(.9)}
+
+/* ---------- motion ---------- */
+@keyframes enter{from{opacity:0;transform:translateY(14px);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
+@keyframes drift1{0%,100%{transform:translate(0,0)}50%{transform:translate(90px,50px)}}
+@keyframes drift2{0%,100%{transform:translate(0,0)}50%{transform:translate(-80px,70px)}}
+@keyframes bar{0%,100%{transform:scaleY(.25)}50%{transform:scaleY(1)}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes rise{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes pop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.06);opacity:1}100%{transform:scale(1)}}
+@keyframes halo{0%{box-shadow:0 0 0 0 rgba(127,227,192,.5)}100%{box-shadow:0 0 0 26px rgba(127,227,192,0)}}
+@keyframes slide{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes hint{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes toast{from{opacity:0;transform:translate(-50%,20px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes arc{from{stroke-dashoffset:779}to{stroke-dashoffset:0}}
+@keyframes cdpop{0%{transform:scale(1.5);opacity:0;filter:blur(10px)}40%{opacity:1;filter:none}100%{transform:scale(1)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes blink{50%{opacity:.25}}
+@keyframes scan{0%{transform:translateX(-100%)}100%{transform:translateX(400%)}}
+.enter{animation:enter .6s var(--ease) both}
+.b1{animation:drift1 16s ease-in-out infinite}.b2{animation:drift2 20s ease-in-out infinite}
+.bar{transform-origin:center;animation:bar .9s ease-in-out infinite}
+.grow{transform-origin:left;animation:grow .9s var(--ease) both}
+.rise{transform-origin:bottom;animation:rise .8s var(--ease) both}
+.pop{animation:pop .5s var(--ease) both}
+.halo{animation:halo 1.4s ease-out infinite}
+.slide{animation:slide .4s ease-out both}
+.spin{animation:spin 1s linear infinite}
+.scan{animation:scan 1.6s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.gx *{animation:none !important}}
+
+/* ---------- phone ---------- */
+@media (max-width:760px){
+.gx{flex-direction:column}
+.rail .logo{display:none}
+.rail{flex:none;flex-direction:row;justify-content:space-around;margin:0;position:fixed;left:8px;right:8px;bottom:8px;border-radius:22px;padding:6px;z-index:40}
+.nav{width:auto;flex:1;padding:8px 0}
+.top{padding:16px 16px 0}
+.who .hm{display:none}
+.scr{padding:16px 16px 100px;gap:14px}
+.row{display:flex;flex-direction:column;gap:14px}
+.h1{font-size:24px}.h1.xl{font-size:28px}
+.card{padding:18px}
+.th{display:none}
+.tr{grid-template-columns:var(--colsm,1fr auto)}
+.tr .hm{display:none}
+.search{max-width:none;flex-basis:100%}
+.stage{padding:18px;gap:10px}
+.stage .ring{width:72px !important;height:72px !important;font-size:20px !important}
+.wv{height:48px}
+.prompt{font-size:21px !important}
+.bigring{width:170px !important;height:170px !important}.bigring>div{width:140px !important;height:140px !important}
+.cd{width:200px;height:200px}.cd .n{font-size:90px}
+.player{gap:10px;padding:10px}
+.toast{bottom:96px;width:calc(100% - 32px);font-size:13px}
+.kpis{display:grid !important;grid-template-columns:1fr 1fr !important}
+body:has(.gx) .dc-switch{left:50% !important;right:auto !important;bottom:86px !important;transform:translateX(-50%)}
+}
+</style>
+</helmet>
+<div class="gx">
+  <div class="blob b1" aria-hidden="true" style="left: -160px; top: -120px; width: 820px; height: 620px; background: radial-gradient(closest-side, rgba(38,160,128,.46), transparent)"></div>
+  <div class="blob b2" aria-hidden="true" style="right: -160px; top: 60px; width: 760px; height: 580px; background: radial-gradient(closest-side, rgba(46,86,170,.4), transparent)"></div>
+  <div class="blob b1" aria-hidden="true" style="left: 35%; bottom: -300px; width: 640px; height: 520px; background: radial-gradient(closest-side, rgba(214,140,50,.22), transparent)"></div>
+
+  <nav class="rail g" aria-label="Main">
+    <div class="logo">N</div>
+    <sc-for list="{{nav}}" as="n" hint-placeholder-count="4">
+      <button class="{{n.cls}}" onClick="{{n.go}}" aria-label="{{n.t}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="{{n.icon}}"></path></svg>{{n.t}}</button>
+    </sc-for>
+  </nav>
+
+  <div class="main">
+    <header class="top">
+      <div class="who"><span class="{{statusCls}}">{{statusLabel}}</span><span class="muted hm">{{whoLine}}</span></div>
+      <sc-if value="{{isLive}}" hint-placeholder-val="{{ false }}">
+        <div class="g" style="display: flex; align-items: center; gap: 8px; padding: 6px 6px 6px 14px; border-radius: 99px"><span class="mono num" style="font-size: 13px; color: #F59C86">{{clock}}</span><button class="btn bad sm" onClick="{{endCall}}">End call</button></div>
+      </sc-if>
+      <sc-if value="{{showRole}}" hint-placeholder-val="{{ true }}">
+        <div class="seg g" role="tablist" aria-label="View as"><button class="{{roleAgentCls}}" onClick="{{asAgent}}">Agent</button><button class="{{roleTlCls}}" onClick="{{asTl}}">Team lead</button></div>
+      </sc-if>
+    </header>
+
+    <!-- ============ HOME ============ -->
+    <sc-if value="{{isHome}}" hint-placeholder-val="{{ true }}">
+      <div class="scr enter" id="s-home">
+        <div class="row">
+          <section class="g hi rl card c7" style="padding: 30px">
+            <div class="head"><span class="pill amb">Coaching ticket · Major</span><span class="lbl">QA AI · 16 Oct</span></div>
+            <h1 class="h1 xl">{{scriptTitle}}</h1>
+            <p style="margin: 0; font-size: 15px; line-height: 1.55; color: var(--ink-2); max-width: 50ch">3 live calls this week with no partial offered after a hardship claim. Pass once to close the ticket.</p>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap"><button class="btn pri" onClick="{{createLobby}}"><svg class="ic" viewBox="0 0 24 24"><path d="{{ic.mic}}"></path></svg>Start duo</button><button class="btn sec" onClick="{{goSolo}}">Solo</button><button class="btn ghost" onClick="{{readCurrent}}"><svg class="ic" viewBox="0 0 24 24"><path d="{{ic.doc}}"></path></svg>Read script</button></div>
+          </section>
+          <section class="g rl card c5">
+            <div class="head"><h2 class="h2">Last 6 scores</h2><span class="lbl">Pass 80</span></div>
+            <div class="bars" style="height: 132px"><div class="pass"></div><sc-for list="{{lastSix}}" as="x" hint-placeholder-count="6"><div class="{{x.cls}} rise" style="height: {{x.h}}; animation-delay: {{x.d}}"></div></sc-for></div>
+            <div style="display: flex; gap: 10px"><sc-for list="{{lastSix}}" as="x" hint-placeholder-count="6"><span class="mono num" style="flex: 1; text-align: center; font-size: 11px; color: var(--ink-2)">{{x.v}}</span></sc-for></div>
+          </section>
+        </div>
+        <div class="row kpis" style="grid-template-columns: repeat(4, minmax(0, 1fr))">
+          <sc-for list="{{agentKpis}}" as="k" hint-placeholder-count="4"><section class="g rm kpi"><span class="lbl">{{k.t}}</span><span class="v num">{{k.v}}</span><span class="{{k.dc}}">{{k.d}}</span></section></sc-for>
+        </div>
+        <section class="g rl card">
+          <div class="head"><h2 class="h2">Practice queue · {{bankName}}</h2><button class="btn sec sm" onClick="{{goBooks}}">All playbooks</button></div>
+          <div class="tbl" style="--cols: 1fr 130px 80px 170px">
+            <div class="th"><span>Script</span><span>Status</span><span>Length</span><span></span></div>
+            <sc-for list="{{queue}}" as="x" hint-placeholder-count="4"><div class="tr slide" style="animation-delay: {{x.d}}"><div class="cell2"><span>{{x.t}}</span><span>{{x.sc}}</span></div><span class="{{x.cls}} hm">{{x.label}}</span><span class="mono muted hm" style="font-size: 12px">{{x.min}} min</span><div class="act"><button class="btn sec sm hm" onClick="{{x.read}}">Read</button><button class="btn pri sm" onClick="{{x.practice}}">Start</button></div></div></sc-for>
+          </div>
+        </section>
+      </div>
+    </sc-if>
+
+    <!-- ============ PLAYBOOKS ============ -->
+    <sc-if value="{{isLibrary}}" hint-placeholder-val="{{ false }}">
+      <div class="scr enter" id="s-books">
+        <div class="head"><h1 class="h1">Playbooks</h1><label class="search"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.search}}"></path></svg><input class="inp" placeholder="Search scripts" value="{{q}}" onInput="{{onSearch}}" aria-label="Search scripts"></label></div>
+        <div class="row">
+          <section class="g rl c4" style="padding: 10px; display: flex; flex-direction: column; gap: 4px; align-self: start">
+            <sc-for list="{{banks}}" as="b" hint-placeholder-count="4"><button class="{{b.cls}}" onClick="{{b.open}}"><div class="cell2"><span>{{b.name}}</span><span>TL {{b.tl}}</span></div><span class="mono num" style="font-size: 12px; color: var(--teal)">{{b.label}}</span></button></sc-for>
+          </section>
+          <section class="g rl card c8">
+            <div class="head"><h2 class="h2" style="font-size: 18px">{{bankName}}</h2><span class="lbl">{{bankDone}} of {{bankTotal}} passed</span></div>
+            <div class="meter"><div class="grow" style="width: {{bankPct}}"></div></div>
+            <div class="chips" role="group" aria-label="Filter"><sc-for list="{{filters}}" as="f" hint-placeholder-count="5"><button class="{{f.cls}}" onClick="{{f.pick}}">{{f.t}} <b>{{f.n}}</b></button></sc-for></div>
+            <div class="tbl" style="--cols: 1fr 120px 70px 160px">
+              <div class="th"><span>Script</span><span>Status</span><span>Length</span><span></span></div>
+              <sc-for list="{{scripts}}" as="x" hint-placeholder-count="5"><div class="tr slide" style="animation-delay: {{x.d}}"><div class="cell2"><span>{{x.n}}. {{x.t}}</span><span>{{x.sc}}</span></div><span class="{{x.cls}} hm">{{x.label}}</span><span class="mono muted hm" style="font-size: 12px">{{x.min}} min</span><div class="act"><sc-if value="{{x.unlocked}}" hint-placeholder-val="{{ true }}"><button class="btn sec sm hm" onClick="{{x.read}}">Read</button><button class="btn pri sm" onClick="{{x.practice}}">Start</button></sc-if><sc-if value="{{x.locked}}" hint-placeholder-val="{{ false }}"><span class="faint" style="display: flex; align-items: center; gap: 6px; font-size: 12px"><svg class="ic" viewBox="0 0 24 24" style="width: 14px; height: 14px"><path d="{{ic.lock}}"></path></svg>Locked</span></sc-if></div></div></sc-for>
+              <sc-if value="{{noScripts}}" hint-placeholder-val="{{ false }}"><div class="empty">No scripts match</div></sc-if>
+            </div>
+          </section>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ SCRIPT ============ -->
+    <sc-if value="{{isScript}}" hint-placeholder-val="{{ false }}">
+      <div class="scr enter" id="s-script">
+        <div class="head" style="align-items: flex-end"><div style="display: flex; flex-direction: column; gap: 6px"><span class="lbl">{{bankName}}</span><h1 class="h1">{{scriptTitle}}</h1></div><button class="btn pri" onClick="{{goHub}}">Practice this</button></div>
+        <div class="row">
+          <nav class="g rl c3" aria-label="Script steps" style="padding: 10px; display: flex; flex-direction: column; gap: 2px; align-self: start"><sc-for list="{{steps}}" as="p" hint-placeholder-count="5"><button class="{{p.cls}}" onClick="{{p.pick}}"><b>0{{p.n}}</b><span>{{p.t}}</span></button></sc-for></nav>
+          <section class="g hi rl card c9" style="padding: 34px; gap: 22px; position: relative; overflow: hidden">
+            <div class="scan" aria-hidden="true" style="position: absolute; left: 0; top: 0; height: 2px; width: 25%; background: linear-gradient(90deg, transparent, var(--teal), transparent)"></div>
+            <span class="lbl" style="color: var(--teal)">Step 0{{stepN}} · {{stepT}}</span>
+            <p class="prompt" style="margin: 0; font-size: 30px; line-height: 1.45; font-weight: 500">{{stepAgent}}</p>
+            <div class="row" style="gap: 14px">
+              <div class="c7 g warm rm" style="padding: 16px 18px"><span class="lbl" style="color: var(--amber)">Debtor cue</span><div style="margin-top: 6px; font-size: 14px; color: var(--amber-2)">{{stepCue}}</div></div>
+              <div class="c5 g rm" style="padding: 16px 18px"><span class="lbl">Scored point</span><div style="margin-top: 6px; font-size: 14px; color: var(--teal)">{{stepReq}}</div></div>
+            </div>
+            <div style="display: flex; gap: 8px"><button class="btn sec sm" onClick="{{prevStep}}">Previous</button><button class="btn sec sm" onClick="{{nextStep}}">Next<svg class="ic" viewBox="0 0 24 24"><path d="{{ic.arrow}}"></path></svg></button></div>
+          </section>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ ROLE PLAY HUB ============ -->
+    <sc-if value="{{isHub}}" hint-placeholder-val="{{ false }}">
+      <div class="scr enter" id="s-hub">
+        <h1 class="h1">Role play</h1>
+        <div class="row">
+          <section class="g rl card c7">
+            <div class="head"><h2 class="h2">Lobbies</h2><div class="seg g"><sc-for list="{{lobbyTabs}}" as="t" hint-placeholder-count="3"><button class="{{t.cls}}" onClick="{{t.pick}}">{{t.t}}</button></sc-for></div></div>
+            <div class="tbl" style="--cols: 1fr 100px 90px">
+              <div class="th"><span>Host</span><span>Status</span><span></span></div>
+              <sc-for list="{{lobbies}}" as="l" hint-placeholder-count="3"><div class="tr slide"><div class="person"><div class="av">{{l.ini}}</div><div class="cell2"><span>{{l.host}}</span><span>{{l.script}} · {{l.bank}}</span></div></div><span class="{{l.pc}} hm">{{l.state}}</span><div class="act"><sc-if value="{{l.open}}" hint-placeholder-val="{{ true }}"><button class="btn pri sm" onClick="{{l.join}}">Join</button></sc-if><sc-if value="{{l.busy}}" hint-placeholder-val="{{ false }}"><span class="lbl">In call</span></sc-if></div></div></sc-for>
+            </div>
+          </section>
+          <section class="g hi rl card c5">
+            <div class="head"><h2 class="h2">New session</h2><div class="seg g"><button class="{{modeDuoCls}}" onClick="{{modeDuo}}">Duo</button><button class="{{modeSoloCls}}" onClick="{{modeSolo}}">Solo</button></div></div>
+            <div class="g rm" style="padding: 14px 16px; display: flex; flex-direction: column; gap: 4px"><span class="lbl">Playbook</span><span>{{bankName}}</span></div>
+            <div class="g rm" style="padding: 14px 16px; display: flex; flex-direction: column; gap: 4px"><span class="lbl">Script</span><span>{{scriptTitle}}</span></div>
+            <span class="muted" style="font-size: 13px">{{modeNote}}</span>
+            <div><button class="btn pri" onClick="{{startSession}}">{{startLabel}}</button></div>
+          </section>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ LOBBY ============ -->
+    <sc-if value="{{isLobby}}" hint-placeholder-val="{{ false }}">
+      <div class="scr enter" id="s-lobby" style="align-items: center; justify-content: center; gap: 30px">
+        <div style="display: flex; align-items: center">
+          <div class="ring halo" style="width: 130px; height: 130px; background: rgba(127,227,192,.14); border: 1px solid rgba(127,227,192,.4); font-size: 32px; font-weight: 600; color: var(--teal)">RM</div>
+          <div style="width: 160px; height: 2px; background: rgba(255,255,255,.1); overflow: hidden"><sc-if value="{{ready}}" hint-placeholder-val="{{ false }}"><div class="grow" style="height: 2px; background: linear-gradient(90deg, var(--teal), var(--amber))"></div></sc-if></div>
+          <div class="ring" style="width: 130px; height: 130px; background: {{dBg}}; border: 1px solid {{dBd}}; font-size: 32px; font-weight: 600; color: var(--amber); transition: background .5s, border-color .5s">JD</div>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center"><span style="font-size: 22px; font-weight: 600">{{dialText}}</span><span class="lbl">{{bankName}} · {{scriptTitle}}</span></div>
+        <section class="g rm" style="padding: 16px 20px; max-width: 520px; font-size: 14px; line-height: 1.55; color: var(--ink-2); text-align: center">{{brief}}</section>
+        <sc-if value="{{ready}}" hint-placeholder-val="{{ false }}"><button class="btn pri lg pop" onClick="{{goCount}}">Go live</button></sc-if>
+      </div>
+    </sc-if>
+
+    <!-- ============ COUNTDOWN ============ -->
+    <sc-if value="{{isCount}}" hint-placeholder-val="{{ false }}">
+      <div class="scr" id="s-count" style="align-items: center; justify-content: center; gap: 26px">
+        <sc-if value="{{cd3}}" hint-placeholder-val="{{ true }}"><div class="cd" id="cd3"><svg viewBox="0 0 260 260"><circle class="trk" cx="130" cy="130" r="124"></circle><circle class="arc" cx="130" cy="130" r="124"></circle></svg><span class="n num">3</span></div></sc-if>
+        <sc-if value="{{cd2}}" hint-placeholder-val="{{ false }}"><div class="cd" id="cd2"><svg viewBox="0 0 260 260"><circle class="trk" cx="130" cy="130" r="124"></circle><circle class="arc" cx="130" cy="130" r="124"></circle></svg><span class="n num">2</span></div></sc-if>
+        <sc-if value="{{cd1}}" hint-placeholder-val="{{ false }}"><div class="cd" id="cd1"><svg viewBox="0 0 260 260"><circle class="trk" cx="130" cy="130" r="124"></circle><circle class="arc" cx="130" cy="130" r="124"></circle></svg><span class="n num">1</span></div></sc-if>
+        <sc-if value="{{cd0}}" hint-placeholder-val="{{ false }}"><div class="cd" id="cd0"><span class="go">Live</span></div></sc-if>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px"><span class="lbl">{{scriptTitle}}</span><span class="muted" style="font-size: 13px">{{countWith}}</span></div>
+      </div>
+    </sc-if>
+
+    <!-- ============ LIVE ============ -->
+    <sc-if value="{{isLive}}" hint-placeholder-val="{{ false }}">
+      <div class="scr enter" id="s-live">
+        <div class="row">
+          <div class="c8 stack">
+            <section class="g rl stage">
+              <div class="spk"><div class="ring" style="width: 104px; height: 104px; background: rgba(127,227,192,.14); box-shadow: {{aGlow}}; font-size: 26px; font-weight: 600; color: var(--teal)">RM</div><span class="lbl" style="color: {{aCol}}">{{aState}}</span></div>
+              <div class="wv" aria-hidden="true"><sc-for list="{{wave}}" as="w" hint-placeholder-count="32"><i class="bar" style="height: {{w.h}}; animation-delay: {{w.d}}; background: {{waveCol}}"></i></sc-for></div>
+              <div class="spk"><div class="ring" style="width: 104px; height: 104px; background: rgba(242,194,135,.1); box-shadow: {{dGlow}}; font-size: 26px; font-weight: 600; color: var(--amber)">JD</div><span class="lbl" style="color: {{dCol}}">{{dState}}</span></div>
+            </section>
+            <section class="g hi rl card" style="padding: 24px 28px; gap: 10px"><span class="lbl" style="color: var(--teal)">{{nowLabel}}</span><p style="margin: 0; font-size: 21px; line-height: 1.5"><span>{{said}}</span> <span style="color: var(--faint)">{{rest}}</span></p></section>
+            <sc-if value="{{showHint}}" hint-placeholder-val="{{ false }}">
+              <div class="hint" id="hint" role="status"><div class="sp"><svg class="ic" viewBox="0 0 24 24"><path d="{{ic.spark}}"></path></svg></div><div><span class="lbl" style="color: var(--teal)">AI hint · Hardship cue</span><div class="say">Offer a split now: ₱6,000 on 25 Oct, ₱6,000 on 8 Nov</div></div></div>
+            </sc-if>
+            <sc-if value="{{hasDebtor}}" hint-placeholder-val="{{ true }}"><div class="slide" style="padding: 0 6px; font-size: 15px; color: var(--ink-2)"><span class="lbl" style="color: var(--amber)">{{debtorName}} </span>{{debtorLine}}</div></sc-if>
+          </div>
+          <aside class="g rl c4" style="padding: 20px; display: flex; flex-direction: column; gap: 8px; align-self: start">
+            <div class="head" style="padding-bottom: 4px"><h2 class="h2">Required points</h2><span class="mono muted num" style="font-size: 12px">{{metCount}}/5</span></div>
+            <sc-for list="{{pts}}" as="p" hint-placeholder-count="5"><div class="{{p.cls}}"><span class="dot"><svg class="ic" viewBox="0 0 24 24"><path d="{{p.icon}}"></path></svg></span><span class="t">{{p.t}}</span><span class="tm">{{p.time}}</span></div></sc-for>
+          </aside>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ PROCESSING ============ -->
+    <sc-if value="{{isProc}}" hint-placeholder-val="{{ false }}">
+      <div class="scr enter" id="s-proc" style="align-items: center; justify-content: center">
+        <section class="g rl pipe">
+          <div class="head" style="margin-bottom: 8px"><div style="display: flex; flex-direction: column; gap: 4px"><span class="lbl">Scoring session</span><h1 class="h1" style="font-size: 24px">{{scriptTitle}}</h1></div><svg class="ic lg spin" viewBox="0 0 24 24" style="color: var(--teal)" aria-hidden="true"><path d="M12 3a9 9 0 1 1-9 9"></path></svg></div>
+          <sc-for list="{{pipe}}" as="p" hint-placeholder-count="4"><div class="{{p.cls}}"><div class="pi"><svg class="ic" viewBox="0 0 24 24"><path d="{{p.icon}}"></path></svg></div><div><div style="display: flex; justify-content: space-between; gap: 10px"><span style="font-weight: 600">{{p.t}}</span><span class="muted hm" style="font-size: 12px">{{p.d}}</span></div><div class="pm"><div style="width: {{p.w}}"></div></div></div><span class="pr num">{{p.r}}</span></div></sc-for>
+        </section>
+      </div>
+    </sc-if>
+
+    <!-- ============ RESULTS ============ -->
+    <sc-if value="{{isResults}}" hint-placeholder-val="{{ false }}">
+      <div class="scr enter" id="s-results">
+        <div class="row">
+          <div class="c4 stack">
+            <section class="g rl card" style="align-items: center; gap: 16px; padding: 28px">
+              <div class="ring bigring" style="width: 200px; height: 200px; background: {{scoreRing}}; box-shadow: 0 0 60px rgba(127,227,192,.2)"><div style="width: 166px; height: 166px; border-radius: 50%; background: var(--panel); display: flex; flex-direction: column; align-items: center; justify-content: center"><span class="num" style="font-size: 54px; font-weight: 600; line-height: 1">{{score}}</span><span class="lbl">/ 100</span></div></div>
+              <sc-if value="{{done}}" hint-placeholder-val="{{ true }}"><span class="pill ok pop">Passed · Sent to TL</span></sc-if>
+              <div style="width: 100%; display: flex; flex-direction: column; gap: 12px"><sc-for list="{{crit}}" as="c" hint-placeholder-count="3"><div style="display: flex; flex-direction: column; gap: 6px"><div style="display: flex; justify-content: space-between; font-size: 13px"><span>{{c.t}}</span><span class="mono num">{{c.v}}</span></div><div class="meter"><div class="grow" style="width: {{c.w}}; animation-delay: {{c.d}}"></div></div></div></sc-for></div>
+            </section>
+            <sc-if value="{{isDuo}}" hint-placeholder-val="{{ true }}">
+              <section class="g warm rl card">
+                <div class="head"><h2 class="h2">Rate Jomar as debtor</h2><sc-if value="{{rated}}" hint-placeholder-val="{{ false }}"><span class="pill ok pop">Sent</span></sc-if></div>
+                <div class="stars" role="radiogroup" aria-label="Debtor rating"><sc-for list="{{stars}}" as="s" hint-placeholder-count="5"><button class="{{s.cls}}" onClick="{{s.pick}}" aria-label="{{s.n}} stars"><svg class="ic f" viewBox="0 0 24 24"><path d="{{ic.star}}"></path></svg></button></sc-for></div>
+                <div class="chips"><sc-for list="{{rtags}}" as="t" hint-placeholder-count="3"><button class="{{t.cls}}" onClick="{{t.pick}}">{{t.t}}</button></sc-for></div>
+                <sc-if value="{{canRate}}" hint-placeholder-val="{{ true }}"><div><button class="btn sec sm" onClick="{{sendRating}}">Send rating</button></div></sc-if>
+              </section>
+            </sc-if>
+          </div>
+          <div class="c8 stack">
+            <div class="head"><h1 class="h1" style="font-size: 28px">{{scriptTitle}}</h1><div class="seg g"><button class="{{tabSummaryCls}}" onClick="{{tabSummary}}">Summary</button><button class="{{tabTranscriptCls}}" onClick="{{tabTranscript}}">Transcript</button></div></div>
+            <section class="g rl player">
+              <button class="icbtn" onClick="{{togglePlay}}" aria-label="{{playLabel}}"><svg class="{{playIc}}" viewBox="0 0 24 24"><path d="{{playPath}}"></path></svg></button>
+              <span class="mono num" style="font-size: 12px; width: 44px">{{phLabel}}</span>
+              <div class="scrub" data-scrub="1" onClick="{{seek}}" role="slider" aria-label="Playback" aria-valuemin="0" aria-valuemax="320" aria-valuenow="{{phInt}}">
+                <div class="segs"><sc-for list="{{segments}}" as="g" hint-placeholder-count="9"><div style="flex: {{g.f}}; background: {{g.c}}"></div></sc-for></div>
+                <div class="played" style="width: {{phPct}}"></div>
+                <sc-for list="{{moments}}" as="m" hint-placeholder-count="5"><span class="{{m.mk}}" style="left: {{m.left}}"></span></sc-for>
+                <div class="head" style="left: {{phPct}}"></div>
+              </div>
+              <span class="mono muted" style="font-size: 12px">05:20</span>
+            </section>
+            <sc-if value="{{isSummary}}" hint-placeholder-val="{{ true }}">
+              <section class="g rl card" style="gap: 6px">
+                <div class="head" style="padding: 0 10px 8px"><h2 class="h2">Key moments</h2><div style="display: flex; gap: 14px; font-size: 12px" class="muted"><span><span style="color: var(--teal)">●</span> Rica</span><span><span style="color: var(--amber)">●</span> {{debtorName}}</span></div></div>
+                <sc-for list="{{moments}}" as="m" hint-placeholder-count="5"><button class="bk" onClick="{{m.seek}}" style="padding: 10px"><span style="display: grid; grid-template-columns: 50px 1fr; gap: 12px; align-items: baseline; min-width: 0"><span class="mono muted num" style="font-size: 12px">{{m.time}}</span><span style="font-size: 14px"><b style="font-weight: 600">{{m.t}}</b> <span class="muted hm">{{m.q}}</span></span></span><span class="{{m.pc}}">{{m.tag}}</span></button></sc-for>
+              </section>
+              <div class="row">
+                <sc-for list="{{metrics}}" as="x" hint-placeholder-count="3"><section class="g rm kpi c4"><span class="lbl">{{x.t}}</span><span class="v num" style="font-size: 24px">{{x.v}}</span><span class="d">{{x.note}}</span></section></sc-for>
+              </div>
+              <section class="g warm rl card" style="flex-direction: row; gap: 14px; align-items: flex-start"><div class="hint" style="padding: 0; border: 0; background: none; box-shadow: none; animation: none"><div class="sp" style="background: rgba(242,194,135,.16); color: var(--amber)"><svg class="ic" viewBox="0 0 24 24"><path d="{{ic.spark}}"></path></svg></div></div><div style="display: flex; flex-direction: column; gap: 6px"><h2 class="h2" style="color: var(--amber)">AI coaching</h2><span style="font-size: 14px; line-height: 1.6; color: var(--amber-2)">Strong opening and recap. The split came 1:16 after the hardship cue. Offer options right after the cue, then confirm both dates.</span></div></section>
+            </sc-if>
+            <sc-if value="{{isTranscript}}" hint-placeholder-val="{{ false }}">
+              <section class="g rl card" style="gap: 2px; padding: 16px"><sc-for list="{{transcript}}" as="l" hint-placeholder-count="9"><div class="{{l.cls}}"><span class="mono muted num" style="font-size: 12px">{{l.ts}}</span><span><span class="wh">{{l.who}}</span>{{l.text}}</span></div></sc-for></section>
+            </sc-if>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap"><button class="btn pri" onClick="{{goHome}}">Back to queue</button><button class="btn sec" onClick="{{replay}}"><svg class="ic" viewBox="0 0 24 24"><path d="{{ic.replay}}"></path></svg>Replay</button><button class="btn ghost" onClick="{{goProgress}}">Progress</button></div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ PROGRESS ============ -->
+    <sc-if value="{{isProgress}}" hint-placeholder-val="{{ false }}">
+      <div class="scr enter" id="s-progress">
+        <h1 class="h1">Progress</h1>
+        <div class="row">
+          <section class="g rl card c8">
+            <div class="head"><h2 class="h2">Average score by week</h2><span class="lbl">Pass 80</span></div>
+            <div class="bars" style="height: 220px; gap: 14px"><div class="pass"></div><sc-for list="{{trend}}" as="w" hint-placeholder-count="6"><div style="flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px"><span class="mono num" style="font-size: 12px">{{w.v}}</span><div class="{{w.cls}} rise" style="width: 100%; height: {{w.h}}; animation-delay: {{w.d}}"></div><span class="lbl">{{w.w}}</span></div></sc-for></div>
+          </section>
+          <section class="g rl card c4">
+            <h2 class="h2">Skills</h2>
+            <sc-for list="{{skills}}" as="k" hint-placeholder-count="4"><div style="display: flex; flex-direction: column; gap: 6px"><div style="display: flex; justify-content: space-between; font-size: 13px"><span>{{k.t}}</span><span class="mono num">{{k.v}}</span></div><div class="meter"><div class="grow" style="width: {{k.w}}; animation-delay: {{k.d}}"></div></div></div></sc-for>
+          </section>
+        </div>
+        <section class="g rl card">
+          <h2 class="h2">History</h2>
+          <div class="tbl" style="--cols: 1fr 140px 110px 60px">
+            <div class="th"><span>Script</span><span>Partner</span><span>Result</span><span style="text-align: right">Score</span></div>
+            <sc-for list="{{history}}" as="h" hint-placeholder-count="5"><div class="tr" style="--colsm: 1fr auto"><div class="cell2"><span>{{h.t}}</span><span>{{h.d}}</span></div><span class="muted hm">{{h.with}}</span><span class="{{h.pc}} hm">{{h.res}}</span><span class="mono num" style="text-align: right; font-size: 15px; color: {{h.col}}">{{h.s}}</span></div></sc-for>
+          </div>
+        </section>
+      </div>
+    </sc-if>
+
+    <!-- ============ TEAM LEAD: TEAM ============ -->
+    <sc-if value="{{isTeam}}" hint-placeholder-val="{{ false }}">
+      <div class="scr enter" id="s-team">
+        <h1 class="h1">Team · MC 7</h1>
+        <div class="row kpis" style="grid-template-columns: repeat(4, minmax(0, 1fr))">
+          <sc-for list="{{teamKpis}}" as="k" hint-placeholder-count="4"><section class="g rm kpi"><span class="lbl">{{k.t}}</span><span class="v num">{{k.v}}</span><span class="{{k.dc}}">{{k.d}}</span></section></sc-for>
+        </div>
+        <section class="g rl card">
+          <div class="head"><div class="chips" role="group" aria-label="Filter"><sc-for list="{{tFilters}}" as="f" hint-placeholder-count="4"><button class="{{f.cls}}" onClick="{{f.pick}}">{{f.t}} <b>{{f.n}}</b></button></sc-for></div><label class="search"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.search}}"></path></svg><input class="inp" placeholder="Search agents" value="{{tq}}" onInput="{{onTeamSearch}}" aria-label="Search agents"></label></div>
+          <div class="tbl" style="--cols: 1.3fr 1.4fr 70px 140px 70px 100px">
+            <div class="th"><span>Agent</span><span>Last session</span><span>Score</span><span>Ticket</span><span>Last 6</span><span></span></div>
+            <sc-for list="{{agents}}" as="a" hint-placeholder-count="8"><div class="{{a.cls}}" style="--colsm: 1fr auto auto"><div class="person"><div class="av">{{a.ini}}</div><div class="cell2"><span>{{a.n}}</span><span>{{a.d}}</span></div></div><span class="hm" style="font-size: 13px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{a.script}}</span><span class="mono num" style="font-size: 15px; color: {{a.col}}">{{a.s}}</span><span class="{{a.pc}} hm">{{a.tl}}</span><div class="spark hm" aria-hidden="true"><sc-for list="{{a.spark}}" as="b" hint-placeholder-count="6"><i class="{{b.c}}" style="height: {{b.h}}"></i></sc-for></div><div class="act"><button class="{{a.bc}}" data-review="{{a.id}}" onClick="{{a.review}}">Review</button></div></div></sc-for>
+            <sc-if value="{{noAgents}}" hint-placeholder-val="{{ false }}"><div class="empty">No agents match</div></sc-if>
+          </div>
+        </section>
+      </div>
+    </sc-if>
+
+    <!-- ============ TEAM LEAD: REVIEW ============ -->
+    <sc-if value="{{isReview}}" hint-placeholder-val="{{ false }}">
+      <div class="scr enter" id="s-review">
+        <div class="head" style="align-items: flex-end"><div class="person"><div class="av lg">{{rv.ini}}</div><div style="display: flex; flex-direction: column; gap: 4px"><span class="lbl">Session review · {{rv.d}}</span><h1 class="h1" style="font-size: 26px">{{rv.n}} · {{rv.script}}</h1></div></div><span class="{{rv.pc}}">{{rv.tl}}</span></div>
+        <div class="row">
+          <div class="c8 stack">
+            <section class="g rl player">
+              <button class="icbtn" onClick="{{togglePlay}}" aria-label="{{playLabel}}"><svg class="{{playIc}}" viewBox="0 0 24 24"><path d="{{playPath}}"></path></svg></button>
+              <span class="mono num" style="font-size: 12px; width: 44px">{{phLabel}}</span>
+              <div class="scrub" data-scrub="1" onClick="{{seek}}" role="slider" aria-label="Playback" aria-valuemin="0" aria-valuemax="320" aria-valuenow="{{phInt}}">
+                <div class="segs"><sc-for list="{{segments}}" as="g" hint-placeholder-count="9"><div style="flex: {{g.f}}; background: {{g.c}}"></div></sc-for></div>
+                <div class="played" style="width: {{phPct}}"></div>
+                <sc-for list="{{moments}}" as="m" hint-placeholder-count="5"><span class="{{m.mk}}" style="left: {{m.left}}"></span></sc-for>
+                <div class="head" style="left: {{phPct}}"></div>
+              </div>
+              <span class="mono muted" style="font-size: 12px">05:20</span>
+            </section>
+            <section class="g rl card" style="gap: 2px; padding: 16px"><sc-for list="{{transcript}}" as="l" hint-placeholder-count="9"><div class="{{l.cls}}"><span class="mono muted num" style="font-size: 12px">{{l.ts}}</span><span><span class="wh">{{l.who}}</span>{{l.text}}</span></div></sc-for></section>
+          </div>
+          <div class="c4 stack">
+            <section class="g rl card">
+              <div class="head"><h2 class="h2">AI score</h2><span class="mono num" style="font-size: 26px; font-weight: 600; color: {{rv.col}}">{{rv.s}}</span></div>
+              <sc-for list="{{crit}}" as="c" hint-placeholder-count="3"><div style="display: flex; flex-direction: column; gap: 6px"><div style="display: flex; justify-content: space-between; font-size: 13px"><span>{{c.t}}</span><span class="mono num">{{c.v}}</span></div><div class="meter"><div class="grow" style="width: {{c.w}}; animation-delay: {{c.d}}"></div></div></div></sc-for>
+            </section>
+            <section class="g rl card" style="gap: 6px">
+              <h2 class="h2" style="padding: 0 10px 6px">Flagged</h2>
+              <sc-for list="{{flags}}" as="m" hint-placeholder-count="2"><button class="bk" onClick="{{m.seek}}" style="padding: 10px"><span style="display: flex; gap: 10px; align-items: baseline; min-width: 0"><span class="mono muted num" style="font-size: 12px">{{m.time}}</span><span style="font-size: 14px">{{m.t}}</span></span><span class="{{m.pc}}">{{m.tag}}</span></button></sc-for>
+            </section>
+            <section class="g hi rl card">
+              <div class="head"><h2 class="h2">Decision</h2><div class="seg g"><button class="{{decApproveCls}}" onClick="{{decApprove}}">Approve</button><button class="{{decRedoCls}}" onClick="{{decRedo}}">Redo</button></div></div>
+              <div class="g rm" style="padding: 12px 14px; font-size: 13px; line-height: 1.55; color: var(--ink-2)">{{decNote}}</div>
+              <sc-if value="{{canDecide}}" hint-placeholder-val="{{ true }}"><button class="btn pri" onClick="{{submitDecision}}">{{decLabel}}</button></sc-if><sc-if value="{{decided}}" hint-placeholder-val="{{ false }}"><span class="pill ok" style="justify-self: center">Ticket closed</span></sc-if>
+            </section>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{hasToast}}" hint-placeholder-val="{{ false }}">
+    <div class="toast" id="{{toastId}}" role="status"><i><svg class="ic" viewBox="0 0 24 24" style="width: 16px; height: 16px; stroke-width: 2.5"><path d="{{ic.check}}"></path></svg></i>{{toast}}</div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"frame":{"editor":"enum","options":["app","home","books","script","hub","lobby","count","live","proc","results","transcript","progress","team","review","closed"],"default":"live"},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.IC = {
+      home: 'M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5.5v-6h-5v6H4a1 1 0 0 1-1-1z',
+      books: 'M5 4h10a3 3 0 0 1 3 3v14H8a3 3 0 0 1-3-3zM5 18a3 3 0 0 1 3-3h10M9 8h5',
+      mic: 'M12 3a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3zM5 11a7 7 0 0 0 14 0M12 18v3',
+      chart: 'M4 20V11M10 20V5M16 20v-6M3 20h18',
+      users: 'M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM2 21a7 7 0 0 1 14 0M16 3.5a4 4 0 0 1 0 7.5M22 21a7 7 0 0 0-4-6.3',
+      review: 'M9 3h6v3H9zM7 4.5H5V21h14V4.5h-2M8.5 14l2.5 2.5 5-5',
+      search: 'M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4',
+      play: 'M8 5v14l11-7z', pause: 'M8 5h3v14H8zM13 5h3v14h-3z',
+      check: 'M5 12.5l4.5 4.5L19 7.5',
+      spark: 'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM18.5 15.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z',
+      wave: 'M3 12h1M7 8v8M11 4v16M15 8v8M19 10v4',
+      doc: 'M6 3h8l5 5v13H6zM14 3v5h5M9 13h7M9 17h5',
+      arrow: 'M5 12h14M13 6l6 6-6 6',
+      lock: 'M6 11h12v10H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3',
+      star: 'M12 2.8l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17l-5.6 3 1.1-6.2L3 9.4l6.2-.9z',
+      replay: 'M4 12a8 8 0 1 0 2.3-5.7M4 4v4h4',
+      rec: 'M12 3a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3zM5 11a7 7 0 0 0 14 0',
+      text: 'M5 6h14M5 11h14M5 16h9',
+      scan: 'M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M8 12h8',
+      gauge: 'M4 16a8 8 0 1 1 16 0M12 16l4-5'
+    };
+    this.BANKS = [
+      { id: 'amihan', name: 'Amihan Demo Bank', tl: 'Mark Ocampo', total: 5, done: 1 },
+      { id: 'harbor', name: 'Harbor Demo Bank', tl: 'Mark Ocampo', total: 7, done: 0 },
+      { id: 'lakbay', name: 'Lakbay Demo Bank', tl: 'Joy Santiago', total: 6, done: 0 },
+      { id: 'bayanihan', name: 'Bayanihan Demo Bank', tl: 'Joy Santiago', total: 4, done: 0 }
+    ];
+    this.SCRIPTS = [
+      { id: 'app', t: 'Affordable Partial Payment', sc: 'Borrower can pay part of the amount now', min: 8, status: 'ticket' },
+      { id: 'ptp', t: 'Payment Commitment Check-in', sc: 'Confirm a promised payment date still holds', min: 7, status: 'progress' },
+      { id: 'ref', t: 'Refusal to Pay', sc: 'Debtor refuses and shows no intent to pay', min: 8, status: 'new' },
+      { id: 'std', t: 'Standard Negotiation', sc: 'Basic collection flow for regular accounts', min: 6, status: 'passed' },
+      { id: 'set', t: 'Settlement Negotiation', sc: 'Debtor asks for a reduced one-time settlement', min: 9, status: 'locked' }
+    ];
+    this.STEPS = [
+      { t: 'Opening and identity check', req: 'Verify identity', at: 2, agent: 'Magandang hapon po, si Rica po ito ng Amihan Bank. Si Mr. Jomar Dizon po ba ito?', cue: 'Confirms his name, sounds guarded.' },
+      { t: 'Restate the promise', req: 'Confirm PTP date and amount', at: 5, agent: 'Tumatawag po ako para i-confirm ang ₱12,000 na bayad natin sa 25 Oct.', cue: 'Hesitates and mentions a lost sideline job.' },
+      { t: 'Probe ability to pay', req: 'Probe ability to pay', at: 10, agent: 'Naiintindihan ko po. Ano po ang pinagkukunan natin ng pambayad ngayong buwan?', cue: 'Says only half is possible on the 25th.' },
+      { t: 'Offer a partial', req: 'Offer partial if needed', at: 14, agent: 'Pwede po nating hatiin: ₱6,000 sa 25 Oct at ₱6,000 sa 8 Nov.', cue: 'Agrees to the split.' },
+      { t: 'Recap and close', req: 'Recap and close', at: 18, agent: 'Recap po: ₱6,000 sa 25 Oct, ₱6,000 sa 8 Nov. Salamat po, Mr. Dizon.', cue: 'Thanks the agent and ends the call.' }
+    ];
+    this.LINES = [
+      { at: 0, who: 'a', text: 'Magandang hapon po, si Rica po ito ng Amihan Bank. Si Mr. Jomar Dizon po ba ito?' },
+      { at: 2, who: 'd', text: 'Oo, ako nga. Ano yun?' },
+      { at: 3, who: 'a', text: 'I-confirm ko lang po ang ₱12,000 natin sa 25 Oct.' },
+      { at: 6, who: 'd', text: 'Medyo mahirap ngayon. Nawalan ako ng sideline.' },
+      { at: 8, who: 'a', text: 'Naiintindihan ko po. Ano po ang pinagkukunan natin ng pambayad ngayong buwan?' },
+      { at: 11, who: 'd', text: 'Baka kalahati lang kaya ko sa 25.' },
+      { at: 12, who: 'a', text: 'Pwede po nating hatiin: ₱6,000 sa 25 Oct at ₱6,000 sa 8 Nov.' },
+      { at: 15, who: 'd', text: 'Sige, kaya ko yun.' },
+      { at: 16, who: 'a', text: 'Recap po: ₱6,000 sa 25 Oct, ₱6,000 sa 8 Nov. Salamat po, Mr. Dizon.' }
+    ];
+    this.LOBBIES = [
+      { host: 'Joy Santiago', ini: 'JS', script: 'Payment Commitment Check-in', bank: 'Amihan', state: 'Open' },
+      { host: 'Mark Ocampo', ini: 'MO', script: 'Refusal to Pay', bank: 'Harbor', state: 'Open' },
+      { host: 'Paolo Reyes', ini: 'PR', script: 'Standard Negotiation', bank: 'Lakbay', state: 'Ongoing' },
+      { host: 'Ana Lim', ini: 'AL', script: 'Settlement Negotiation', bank: 'Amihan', state: 'Ongoing' }
+    ];
+    this.HISTORY = [
+      { t: 'Affordable Partial Payment', d: 'Fri 17 Oct', s: 78, with: 'Jomar D.' },
+      { t: 'Standard Negotiation', d: 'Tue 14 Oct', s: 86, with: 'Joy S.' },
+      { t: 'Promise to Pay', d: 'Thu 9 Oct', s: 88, with: 'Solo' },
+      { t: 'Refusal to Pay', d: 'Mon 6 Oct', s: 72, with: 'Paolo R.' },
+      { t: 'Standard Negotiation', d: 'Fri 3 Oct', s: 75, with: 'Ana L.' }
+    ];
+    this.AGENTS = [
+      { id: 'rica', n: 'Rica Manalo', ini: 'RM', script: 'Affordable Partial Payment', s: 78, d: 'Fri 17 Oct', last: [72, 84, 78, 88, 75, 78] },
+      { id: 'kim', n: 'Kim Tan', ini: 'KT', script: 'Payment Commitment Check-in', s: 81, d: 'Today', last: [70, 74, 77, 79, 80, 81] },
+      { id: 'joy', n: 'Joy Santiago', ini: 'JS', script: 'Payment Commitment Check-in', s: 86, d: 'Mon 20 Oct', last: [80, 82, 79, 85, 88, 86] },
+      { id: 'paolo', n: 'Paolo Reyes', ini: 'PR', script: 'Refusal to Pay', s: 72, d: 'Mon 20 Oct', last: [70, 68, 74, 71, 69, 72] },
+      { id: 'ana', n: 'Ana Lim', ini: 'AL', script: 'Standard Negotiation', s: 91, d: 'Sat 18 Oct', last: [84, 86, 88, 90, 89, 91] },
+      { id: 'ben', n: 'Ben Cruz', ini: 'BC', script: 'Settlement Negotiation', s: 76, d: 'Sat 18 Oct', last: [66, 70, 72, 75, 74, 76] },
+      { id: 'leo', n: 'Leo Villanueva', ini: 'LV', script: 'Refusal to Pay', s: 68, d: 'Fri 17 Oct', last: [64, 70, 66, 69, 71, 68] },
+      { id: 'mae', n: 'Mae Garcia', ini: 'MG', script: 'Standard Negotiation', s: 88, d: 'Thu 16 Oct', last: [82, 85, 84, 87, 86, 88] }
+    ];
+    this.TREND = [62, 68, 66, 73, 78, 81];
+    this.SKILLS = [ { t: 'Verification', v: 92 }, { t: 'Probing', v: 74 }, { t: 'Offering options', v: 58 }, { t: 'Closing', v: 81 } ];
+    this.PIPE = [
+      { t: 'Recording saved', d: '05:20 · 2 speakers', icon: 'rec' },
+      { t: 'Transcribing', d: '9 turns · Taglish', icon: 'text' },
+      { t: 'Analyzing', d: '5 required points', icon: 'scan' },
+      { t: 'Scoring', d: 'Rubric · 100 pts', icon: 'gauge' }
+    ];
+    this.state = {
+      role: 'agent', screen: 'home', bank: 'amihan', script: 'app', mode: 'duo', step: 0,
+      tick: 0, ready: false, cd: 3, pstep: 0, pp: 0, score: 0, tab: 'summary', passed: false,
+      ph: 0, playing: false, stars: 0, rtags: {}, rated: false, toast: '', toastN: 0,
+      q: '', filter: 'all', lobbyTab: 'all', tq: '', tfilter: 'all', sel: 'rica', decision: 'approve',
+      tk: { rica: 'open', kim: 'review', paolo: 'open', ben: 'open', leo: 'open' }
+    };
+    const R = { rica: 'review', kim: 'review', paolo: 'open', ben: 'open', leo: 'open' };
+    const done = { score: 84, passed: true, tk: R };
+    const FRAMES = {
+      home: {}, books: { screen: 'books' }, script: { screen: 'script', step: 2 }, hub: { screen: 'hub' },
+      lobby: { screen: 'lobby', ready: true }, count: { screen: 'count', cd: 3 }, live: { screen: 'live', tick: 9 },
+      proc: { screen: 'proc', pstep: 2, pp: 55 },
+      results: Object.assign({ screen: 'results', ph: 112 }, done),
+      transcript: Object.assign({ screen: 'results', tab: 'transcript', ph: 150, stars: 5, rtags: { Realistic: true, 'Followed brief': true } }, done),
+      progress: { screen: 'progress', passed: true },
+      team: Object.assign({ role: 'tl', screen: 'team' }, done),
+      review: Object.assign({ role: 'tl', screen: 'review', ph: 150 }, done),
+      closed: { role: 'tl', screen: 'team', score: 84, passed: true, tk: Object.assign({}, R, { rica: 'closed' }), toast: 'Ticket closed · Rica notified', toastN: 1 }
+    };
+    const fr = (props && props.frame) || 'live';
+    if (FRAMES[fr]) Object.assign(this.state, FRAMES[fr]);
+  }
+  componentDidMount() {
+    const site = /\/flows\//.test(location.pathname);
+    if (site && !this.props.frame) {
+      this.onKey = e => { if (e.key === 'd' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) this.demo(); };
+      document.addEventListener('keydown', this.onKey);
+      if (/[?&]demo/.test(location.search)) setTimeout(() => this.demo(), 600);
+    }
+  }
+  componentWillUnmount() { this.stop(); this.stopDemo(); clearTimeout(this.tt); if (this.onKey) document.removeEventListener('keydown', this.onKey); }
+  stop() { clearInterval(this.iv); clearTimeout(this.to); clearInterval(this.pv); this.iv = this.to = this.pv = null; }
+  go(screen, extra) {
+    this.stop();
+    this.setState(Object.assign({ screen, tick: 0, ready: false, cd: 3, pstep: 0, pp: 0, score: 0, tab: 'summary', ph: 0, playing: false }, extra || {}));
+    if (screen === 'lobby') this.to = setTimeout(() => this.setState({ ready: true }), 1800);
+    if (screen === 'count') this.iv = setInterval(() => { const c = this.state.cd - 1; if (c < 0) { this.go('live'); return; } this.setState({ cd: c }); }, 800);
+    if (screen === 'live') this.iv = setInterval(() => { const t = this.state.tick + 1; if (t > 20) { this.go('proc'); return; } this.setState({ tick: t }); }, 750);
+    if (screen === 'proc') this.iv = setInterval(() => {
+      let { pstep, pp } = this.state; pp += 5;
+      if (pp >= 100) { pstep += 1; pp = 0; }
+      if (pstep >= 4) { clearInterval(this.iv); this.setState({ pstep: 4, pp: 0 }); this.to = setTimeout(() => this.go('results'), 450); return; }
+      this.setState({ pstep, pp });
+    }, 45);
+    if (screen === 'results') this.iv = setInterval(() => {
+      const s = Math.min(84, this.state.score + 2);
+      if (s >= 84) {
+        clearInterval(this.iv);
+        const first = !this.state.passed;
+        this.setState({ score: s, passed: true, tk: Object.assign({}, this.state.tk, this.state.tk.rica === 'closed' ? {} : { rica: 'review' }) });
+        if (first) this.toast('Sent to Mark Ocampo for review');
+      } else this.setState({ score: s });
+    }, 25);
+  }
+  toast(msg) {
+    clearTimeout(this.tt);
+    this.setState({ toast: msg, toastN: this.state.toastN + 1 });
+    this.tt = setTimeout(() => this.setState({ toast: '' }), 3200);
+  }
+  togglePlay() {
+    if (this.state.playing) { clearInterval(this.pv); this.pv = null; this.setState({ playing: false }); return; }
+    if (this.state.ph >= 320) this.setState({ ph: 0 });
+    this.setState({ playing: true });
+    this.pv = setInterval(() => { const p = this.state.ph + 3.2; if (p >= 320) { clearInterval(this.pv); this.pv = null; this.setState({ ph: 320, playing: false }); return; } this.setState({ ph: p }); }, 100);
+  }
+  /* ---------- demo autoplay for screen recording ---------- */
+  stopDemo() { (this.dt || []).forEach(clearTimeout); this.dt = []; document.body.classList.remove('demo'); }
+  press(match) {
+    const app = document.getElementById('app');
+    const el = match.startsWith('[') ? app.querySelector(match) : [...app.querySelectorAll('button')].find(b => b.textContent.trim() === match);
+    if (!el) return;
+    el.classList.add('demo-press');
+    setTimeout(() => { el.classList.remove('demo-press'); el.click(); }, 260);
+  }
+  demo() {
+    this.stopDemo();
+    document.body.classList.add('demo');
+    this.setState({ passed: false, rated: false, stars: 0, rtags: {}, sel: 'rica', decision: 'approve', tfilter: 'all', tq: '', q: '', tk: { rica: 'open', kim: 'review', paolo: 'open', ben: 'open', leo: 'open' }, role: 'agent', mode: 'duo', script: 'app', bank: 'amihan' });
+    this.go('home');
+    const seq = [
+      [2600, 'Start duo'], [2600, 'Go live'],
+      [22200, null],
+      [3000, '[aria-label="Play"]'], [4200, 'Transcript'], [2400, '[aria-label="5 stars"]'], [700, 'Realistic'], [600, 'Followed brief'], [900, 'Send rating'],
+      [2600, 'Team lead'], [3200, '[data-review="rica"]'], [2200, '[aria-label="Play"]'], [4200, 'Approve and close ticket'],
+      [3600, 'end']
+    ];
+    let at = 0;
+    seq.forEach(([d, m]) => { at += d; this.dt.push(setTimeout(() => { if (m === 'end') { document.body.classList.remove('demo'); return; } if (m) this.press(m); }, at)); });
+  }
+  renderVals() {
+    const s = this.state, t = s.tick, scr = s.screen, IC = this.IC;
+    const fmt = x => { x = Math.floor(x); return String(Math.floor(x / 60)).padStart(2, '0') + ':' + String(x % 60).padStart(2, '0'); };
+    const tl = s.role === 'tl';
+    const sect = { home: 'home', books: 'books', book: 'books', script: 'books', hub: 'hub', lobby: 'hub', count: 'hub', live: 'hub', proc: 'hub', results: 'hub', progress: 'progress', team: 'team', review: 'review' }[scr];
+    const bank = this.BANKS.find(b => b.id === s.bank) || this.BANKS[0];
+    const script = this.SCRIPTS.find(x => x.id === s.script) || this.SCRIPTS[0];
+    const labels = { passed: 'Passed', progress: 'In progress', ticket: 'Ticket', new: 'New', locked: 'Locked' };
+    const pcls = { passed: 'pill ok', progress: 'pill info', ticket: 'pill amb', new: 'pill', locked: 'pill' };
+    const passed = s.passed, solo = s.mode === 'solo';
+    const stepI = Math.max(0, Math.min(4, s.step)), step = this.STEPS[stepI];
+
+    /* live */
+    const pts = this.STEPS.map((p, i) => { const met = t > p.at, now = !met && (i === 0 || t > this.STEPS[i - 1].at); return { t: p.req, cls: 'pt ' + (met ? 'met' : now ? 'now' : 'todo'), icon: met ? IC.check : '', time: met ? fmt(p.at * 16) : now ? 'Now' : '' }; });
+    const curI = pts.findIndex(p => p.cls === 'pt now');
+    const vis = this.LINES.filter(l => l.at <= t);
+    const last = vis[vis.length - 1] || this.LINES[0];
+    const lastA = [...vis].reverse().find(l => l.who === 'a') || this.LINES[0];
+    const lastD = [...vis].reverse().find(l => l.who === 'd');
+    const words = lastA.text.split(' ');
+    const n = Math.min(words.length, (t - lastA.at) * 5 + 4);
+    const aTalk = last.who === 'a';
+    const glowA = '0 0 0 6px rgba(127,227,192,.18), 0 0 0 14px rgba(127,227,192,.08), 0 0 50px rgba(127,227,192,.5)';
+    const glowD = '0 0 0 6px rgba(242,194,135,.18), 0 0 0 14px rgba(242,194,135,.08), 0 0 50px rgba(242,194,135,.45)';
+    const wave = [10,18,30,44,26,38,52,30,16,36,48,24,14,32,42,22,10,28,40,18,10,22,30,16,12,24,34,20,12,16,22,10];
+
+    /* playback */
+    const ph = s.ph, agentFirst = tl ? (this.AGENTS.find(a => a.id === s.sel) || this.AGENTS[0]).n.split(' ')[0] : 'Rica';
+    const debtorName = solo && !tl ? 'Recorded' : 'Jomar';
+    let curLine = -1; this.LINES.forEach((l, i) => { if (l.at * 16 <= ph) curLine = i; });
+    const showCur = s.playing || ph > 0;
+    const segs = this.LINES.map((l, i) => { const nx = this.LINES[i + 1]; return { f: (nx ? nx.at : 20) - l.at, c: l.who === 'a' ? 'rgba(127,227,192,.55)' : 'rgba(242,194,135,.5)' }; });
+    const seekTo = sec => this.setState({ ph: sec });
+    const moments = this.STEPS.map((p, i) => ({ time: fmt(p.at * 16), t: p.req, q: '"' + p.agent.split(' ').slice(0, 5).join(' ') + '…"', tag: i === 3 ? 'Late' : 'Met', pc: 'pill ' + (i === 3 ? 'amb' : 'ok'), mk: 'mk ' + (i === 3 ? 'late' : 'met'), left: Math.round(p.at / 20 * 100) + '%', seek: () => seekTo(p.at * 16) }));
+
+    /* playbooks */
+    const scriptAll = this.SCRIPTS.map((x, i) => { const st = passed && x.id === 'app' ? 'passed' : x.status; return { ...x, st, n: i + 1, label: labels[st], cls: pcls[st], locked: st === 'locked', unlocked: st !== 'locked', read: () => this.go('script', { script: x.id, step: 0 }), practice: () => this.go('hub', { script: x.id }) }; });
+    const fkeys = [['all', 'All'], ['ticket', 'Ticket'], ['progress', 'In progress'], ['new', 'New'], ['passed', 'Passed']];
+    const qn = s.q.trim().toLowerCase();
+    const scriptRows = scriptAll.filter(x => (s.filter === 'all' || x.st === s.filter) && (!qn || x.t.toLowerCase().includes(qn))).map((x, i) => ({ ...x, d: (i * 0.04) + 's' }));
+    const bdone = bank.done + (passed && bank.id === 'amihan' ? 1 : 0);
+
+    /* team */
+    const tk = s.tk;
+    const tkLabel = { open: 'Ticket open', review: 'Needs review', closed: 'Closed' };
+    const tkPill = { open: 'pill amb', review: 'pill info', closed: 'pill ok' };
+    const agentsAll = this.AGENTS.map(a => {
+      const sc = a.id === 'rica' && passed ? 84 : a.s, st = tk[a.id];
+      const last6 = a.id === 'rica' && passed ? a.last.slice(0, 5).concat([84]) : a.last;
+      return { ...a, s: sc, d: a.id === 'rica' && passed ? 'Today' : a.d, st, tl: st ? tkLabel[st] : 'None', pc: st ? tkPill[st] : 'pill', col: sc >= 80 ? 'var(--teal)' : 'var(--amber)', spark: last6.map(v => ({ h: Math.max(4, Math.round((v - 55) / 40 * 26)) + 'px', c: v >= 80 ? 'on' : '' })), cls: 'tr' + (st === 'review' ? ' sel' : ''), bc: 'btn sm ' + (st === 'review' ? 'pri' : 'sec'), review: () => this.go('review', { sel: a.id, decision: 'approve' }) };
+    });
+    const tqn = s.tq.trim().toLowerCase();
+    const tf = { all: () => true, review: a => a.st === 'review', open: a => a.st === 'open', below: a => a.s < 80 };
+    const agents = agentsAll.filter(a => tf[s.tfilter](a) && (!tqn || a.n.toLowerCase().includes(tqn)));
+    const rv = agentsAll.find(a => a.id === s.sel) || agentsAll[0];
+    const openCount = agentsAll.filter(a => a.st === 'open' || a.st === 'review').length;
+
+    const navAgent = [['home', 'Home', IC.home], ['books', 'Playbooks', IC.books], ['hub', 'Role play', IC.mic], ['progress', 'Progress', IC.chart]];
+    const navTl = [['team', 'Team', IC.users], ['review', 'Review', IC.review], ['books', 'Playbooks', IC.books]];
+    const status = {
+      home: ['Ready', 'pill ok'], books: ['Study', 'pill'], book: ['Study', 'pill'], script: ['Study', 'pill'], hub: ['Ready', 'pill ok'],
+      lobby: [s.ready ? 'Connected' : 'Connecting', s.ready ? 'pill ok' : 'pill info'], count: ['Starting', 'pill info'], live: ['Live', 'pill bad live'],
+      proc: ['Scoring', 'pill info'], results: ['Wrap up', 'pill ok'], progress: ['Review', 'pill'], team: ['Team lead', 'pill info'], review: ['Team lead', 'pill info']
+    }[scr];
+    const isDuo = !solo;
+    const rtagList = ['Realistic', 'Pushed back', 'Followed brief'];
+
+    return {
+      ic: IC,
+      isHome: scr === 'home', isLibrary: scr === 'books' || scr === 'book', isScript: scr === 'script', isHub: scr === 'hub',
+      isLobby: scr === 'lobby', isCount: scr === 'count', isLive: scr === 'live', isProc: scr === 'proc', isResults: scr === 'results',
+      isProgress: scr === 'progress', isTeam: scr === 'team', isReview: scr === 'review',
+      showRole: !['live', 'count', 'proc'].includes(scr),
+      statusLabel: status[0], statusCls: status[1],
+      whoLine: tl ? 'Mark Ocampo · Team lead · MC 7' : 'Rica Manalo · MC 7',
+      roleAgentCls: 'tab' + (tl ? '' : ' on'), roleTlCls: 'tab' + (tl ? ' on' : ''),
+      asAgent: () => { this.setState({ role: 'agent' }); this.go('home'); },
+      asTl: () => { this.setState({ role: 'tl' }); this.go('team'); },
+      nav: (tl ? navTl : navAgent).map(([id, label, icon]) => ({ t: label, icon, cls: 'nav' + (sect === id ? ' on' : ''), go: () => this.go(id) })),
+      goHome: () => this.go('home'), goBooks: () => this.go('books'), goHub: () => this.go('hub'), goProgress: () => this.go('progress'),
+      goCount: () => this.go('count'), endCall: () => this.go('proc'), replay: () => this.go('count'),
+      readCurrent: () => this.go('script', { step: 0 }), createLobby: () => this.go('lobby', { mode: 'duo' }), goSolo: () => this.go('count', { mode: 'solo' }),
+      nextStep: () => this.setState({ step: Math.min(4, stepI + 1) }), prevStep: () => this.setState({ step: Math.max(0, stepI - 1) }),
+
+      /* home */
+      agentKpis: [
+        { t: 'Streak', v: passed ? '6 days' : '5 days', d: 'Best this month', dc: 'd' },
+        { t: 'Pass rate', v: passed ? '71%' : '67%', d: '+4 pts vs Sep', dc: 'd' },
+        { t: 'Avg score', v: passed ? 82 : 81, d: 'Team avg 79', dc: 'd' },
+        { t: 'Open tickets', v: tk.rica === 'closed' ? 0 : 1, d: tk.rica === 'review' ? 'Awaiting TL' : tk.rica === 'closed' ? 'All clear' : 'Major · due Fri', dc: tk.rica === 'closed' ? 'd' : 'd w' }
+      ],
+      lastSix: [72, 84, 78, 88, 75].concat([passed ? 84 : 78]).map((v, i) => ({ v, h: v + '%', d: (i * 0.06) + 's', cls: 'tb' + (v >= 80 ? ' on' : '') })),
+      queue: scriptAll.filter(x => x.unlocked && x.st !== 'passed').slice(0, 4).map((x, i) => ({ ...x, d: (i * 0.05) + 's' })),
+
+      /* playbooks */
+      q: s.q, onSearch: e => this.setState({ q: e.target.value }),
+      filters: fkeys.map(([k, label]) => ({ t: label, n: k === 'all' ? scriptAll.length : scriptAll.filter(x => x.st === k).length, cls: 'chipb' + (s.filter === k ? ' on' : ''), pick: () => this.setState({ filter: k }) })),
+      bankName: bank.name, bankDone: bdone, bankTotal: bank.total, bankPct: Math.round(bdone / bank.total * 100) + '%',
+      scriptTitle: script.t,
+      banks: this.BANKS.map(b => { const d = b.done + (passed && b.id === 'amihan' ? 1 : 0); return { ...b, label: d + '/' + b.total, cls: 'bk' + (b.id === s.bank ? ' on' : ''), open: () => this.go('book', { bank: b.id, filter: 'all', q: '' }) }; }),
+      scripts: scriptRows, noScripts: scriptRows.length === 0,
+      steps: this.STEPS.map((p, i) => ({ n: i + 1, t: p.t, cls: 'step' + (i === stepI ? ' on' : ''), pick: () => this.setState({ step: i }) })),
+      stepN: stepI + 1, stepT: step.t, stepAgent: step.agent, stepCue: step.cue, stepReq: step.req,
+
+      /* hub */
+      lobbyTabs: [['all', 'All'], ['Open', 'Open'], ['Ongoing', 'Ongoing']].map(([k, label]) => ({ t: label, cls: 'tab' + (s.lobbyTab === k ? ' on' : ''), pick: () => this.setState({ lobbyTab: k }) })),
+      lobbies: this.LOBBIES.filter(l => s.lobbyTab === 'all' || l.state === s.lobbyTab).map(l => ({ ...l, pc: l.state === 'Open' ? 'pill ok' : 'pill info', open: l.state === 'Open', busy: l.state !== 'Open', join: () => this.go('lobby', { mode: 'duo' }) })),
+      modeDuoCls: 'tab' + (solo ? '' : ' on'), modeSoloCls: 'tab' + (solo ? ' on' : ''),
+      modeDuo: () => this.setState({ mode: 'duo' }), modeSolo: () => this.setState({ mode: 'solo' }),
+      modeNote: solo ? 'You take the agent role against a recorded debtor.' : 'You take the agent role. Your partner plays the debtor from the brief.',
+      startLabel: solo ? 'Start solo' : 'Create lobby',
+      startSession: () => solo ? this.go('count', { mode: 'solo' }) : this.go('lobby', { mode: 'duo' }),
+
+      /* lobby + countdown */
+      brief: 'Debtor brief: promised ₱12,000 on 25 Oct. Lost a sideline job last week. Will ask to move the date. Accepts a split if offered.',
+      ready: s.ready,
+      dBg: s.ready ? 'rgba(242,194,135,.16)' : 'rgba(255,255,255,.04)', dBd: s.ready ? 'rgba(242,194,135,.5)' : 'rgba(255,255,255,.12)',
+      dialText: s.ready ? 'Jomar D. joined as debtor' : 'Connecting a partner',
+      cd3: s.cd === 3, cd2: s.cd === 2, cd1: s.cd === 1, cd0: s.cd === 0,
+      countWith: solo ? 'Solo · recorded debtor' : 'With Jomar D. as debtor',
+
+      /* live */
+      aGlow: aTalk ? glowA : 'none', dGlow: aTalk ? 'none' : glowD,
+      aState: aTalk ? 'Speaking' : 'Listening', dState: aTalk ? 'Listening' : (solo ? 'Playing' : 'Speaking'),
+      aCol: aTalk ? 'var(--teal)' : 'var(--faint)', dCol: aTalk ? 'var(--faint)' : 'var(--amber)', waveCol: aTalk ? 'var(--teal)' : 'var(--amber)',
+      wave: wave.map((h, i) => ({ h: Math.round(h / 64 * 100) + '%', d: (i * 0.04) + 's' })),
+      debtorName, debtorLine: lastD ? lastD.text : '', hasDebtor: !!lastD,
+      showHint: t >= 7 && t < 13,
+      pts, metCount: pts.filter(p => p.cls === 'pt met').length,
+      nowLabel: curI >= 0 ? 'Step 0' + (curI + 1) + ' · ' + this.STEPS[curI].t : 'All points met',
+      said: words.slice(0, n).join(' '), rest: words.slice(n).join(' '), clock: fmt(t * 16),
+
+      /* processing */
+      pipe: this.PIPE.map((p, i) => { const done = i < s.pstep, run = i === s.pstep; return { t: p.t, d: p.d, icon: done ? IC.check : IC[p.icon], cls: 'ps ' + (done ? 'done' : run ? 'run' : 'wait'), w: (done ? 100 : run ? s.pp : 0) + '%', r: done ? 'Done' : run ? s.pp + '%' : '' }; }),
+
+      /* results */
+      score: s.score, done: s.score >= 84, scoreRing: 'conic-gradient(var(--teal) ' + (s.score * 3.6) + 'deg, rgba(255,255,255,.08) 0deg)',
+      crit: [ { t: 'Script accuracy', v: '44/50', w: '88%', d: '.1s' }, { t: 'Voice and tone', v: '24/30', w: '80%', d: '.3s' }, { t: 'Negotiation', v: '16/20', w: '80%', d: '.5s' } ],
+      metrics: [ { t: 'Pace', v: '128 wpm', note: 'In range' }, { t: 'Filler words', v: '5%', note: 'Low' }, { t: 'Talk time', v: '58%', note: 'Balanced' } ],
+      tabSummary: () => this.setState({ tab: 'summary' }), tabTranscript: () => this.setState({ tab: 'transcript' }),
+      isSummary: s.tab === 'summary', isTranscript: s.tab === 'transcript',
+      tabSummaryCls: 'tab' + (s.tab === 'summary' ? ' on' : ''), tabTranscriptCls: 'tab' + (s.tab === 'transcript' ? ' on' : ''),
+      isDuo, rated: s.rated, canRate: !s.rated,
+      stars: [1, 2, 3, 4, 5].map(k => ({ n: k, cls: 'star' + (k <= s.stars ? ' on' : ''), pick: () => this.setState({ stars: k }) })),
+      rtags: rtagList.map(x => ({ t: x, cls: 'chipb' + (s.rtags[x] ? ' on' : ''), pick: () => this.setState({ rtags: Object.assign({}, s.rtags, { [x]: !s.rtags[x] }) }) })),
+      sendRating: () => { this.setState({ rated: true }); this.toast('Rating sent to Jomar'); },
+
+      /* player */
+      togglePlay: () => this.togglePlay(), playLabel: s.playing ? 'Pause' : 'Play',
+      playPath: s.playing ? IC.pause : IC.play, playIc: 'ic f',
+      phLabel: fmt(ph), phInt: Math.round(ph), phPct: (ph / 320 * 100).toFixed(2) + '%',
+      seek: e => { const el = e.target.closest('[data-scrub]'); const r = el.getBoundingClientRect(); seekTo(Math.max(0, Math.min(320, (e.clientX - r.left) / r.width * 320))); },
+      segments: segs, moments,
+      transcript: this.LINES.map((l, i) => ({ ts: fmt(l.at * 16), who: l.who === 'a' ? agentFirst : debtorName, text: l.text, cls: 'ln ' + l.who + (showCur ? (i === curLine ? ' cur' : i < curLine ? ' past' : ' future') : '') })),
+
+      /* progress */
+      history: (passed ? [{ t: script.t, d: 'Today', s: 84, with: solo ? 'Solo' : 'Jomar D.' }] : []).concat(this.HISTORY).map(h => ({ ...h, pc: 'pill ' + (h.s >= 80 ? 'ok' : 'amb'), res: h.s >= 80 ? 'Passed' : 'Below 80', col: h.s >= 80 ? 'var(--teal)' : 'var(--amber)' })),
+      trend: this.TREND.map((v, i) => { const x = i === 5 && passed ? 82 : v; return { w: 'W' + (i + 1), v: x, h: x + '%', cls: 'tb' + (i === 5 ? ' on' : ''), d: (i * 0.07) + 's' }; }),
+      skills: this.SKILLS.map((k, i) => { const v = k.t === 'Offering options' && passed ? 66 : k.v; return { t: k.t, v, w: v + '%', d: (i * 0.1) + 's' }; }),
+
+      /* team */
+      teamKpis: [
+        { t: 'Sessions this week', v: passed ? 47 : 46, d: '+8 vs last week', dc: 'd' },
+        { t: 'Pass rate', v: '71%', d: 'Target 75%', dc: 'd w' },
+        { t: 'Open tickets', v: openCount, d: agentsAll.filter(a => a.st === 'review').length + ' need review', dc: 'd w' },
+        { t: 'Avg score', v: 79, d: '+3 pts vs Sep', dc: 'd' }
+      ],
+      tq: s.tq, onTeamSearch: e => this.setState({ tq: e.target.value }),
+      tFilters: [['all', 'All'], ['review', 'Needs review'], ['open', 'Ticket open'], ['below', 'Below 80']].map(([k, label]) => ({ t: label, n: agentsAll.filter(tf[k]).length, cls: 'chipb' + (s.tfilter === k ? ' on' : ''), pick: () => this.setState({ tfilter: k }) })),
+      agents: agents.map(a => ({ ...a, review: a.review })), noAgents: agents.length === 0,
+
+      /* review */
+      rv,
+      flags: moments.filter(m => m.tag === 'Late').concat([{ time: '01:36', t: 'Hardship cue', tag: 'Cue', pc: 'pill info', seek: () => seekTo(96) }]),
+      decApproveCls: 'tab' + (s.decision === 'approve' ? ' on' : ''), decRedoCls: 'tab' + (s.decision === 'redo' ? ' on' : ''),
+      decApprove: () => this.setState({ decision: 'approve' }), decRedo: () => this.setState({ decision: 'redo' }),
+      decNote: s.decision === 'approve' ? 'Good recovery after the hardship cue. Offer the split earlier next time.' : 'Split came late. Redo with the offer right after the cue.',
+      decLabel: rv.st === 'closed' ? 'Ticket closed' : s.decision === 'approve' ? 'Approve and close ticket' : 'Send back for redo',
+      canDecide: rv.st !== 'closed', decided: rv.st === 'closed',
+      submitDecision: () => {
+        const first = rv.n.split(' ')[0];
+        const nt = Object.assign({}, s.tk, { [rv.id]: s.decision === 'approve' ? 'closed' : 'open' });
+        this.setState({ tk: nt });
+        this.toast(s.decision === 'approve' ? 'Ticket closed · ' + first + ' notified' : 'Sent back to ' + first);
+        this.to = setTimeout(() => this.go('team'), 900);
+      },
+
+      /* toast */
+      hasToast: !!s.toast, toast: s.toast, toastId: 't' + s.toastN
+    };
+  }
+}
+</script>
+</body>
+</html>

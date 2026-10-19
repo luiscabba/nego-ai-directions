@@ -584,7 +584,7 @@ body:has(.gx) .dc-switch{left:50% !important;right:auto !important;bottom:86px !
   </sc-if>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"frame":{"editor":"enum","options":["app","home","books","script","hub","lobby","count","live","proc","results","transcript","progress","team","review","closed"],"default":"app"},"$preview":{"width":1440,"height":900}}'>
+<script type="text/x-dc" data-dc-script data-props='{"frame":{"editor":"enum","options":["app","live0","home","books","script","hub","lobby","count","live","proc","results","transcript","progress","team","review","closed"],"default":"app"},"$preview":{"width":1440,"height":900}}'>
 class Component extends DCLogic {
   constructor(props) {
     super(props);
@@ -683,7 +683,7 @@ class Component extends DCLogic {
     const done = { score: 84, passed: true, tk: R };
     const FRAMES = {
       home: {}, books: { screen: 'books' }, script: { screen: 'script', step: 2 }, hub: { screen: 'hub' },
-      lobby: { screen: 'lobby', ready: true }, count: { screen: 'count', cd: 3 }, live: { screen: 'live', tick: 9 },
+      lobby: { screen: 'lobby', ready: true }, count: { screen: 'count', cd: 3 }, live: { screen: 'live', tick: 9 }, live0: { screen: 'live', tick: 4 },
       proc: { screen: 'proc', pstep: 2, pp: 55 },
       results: Object.assign({ screen: 'results', ph: 112 }, done),
       transcript: Object.assign({ screen: 'results', tab: 'transcript', ph: 150, stars: 5, rtags: { Realistic: true, 'Followed brief': true } }, done),

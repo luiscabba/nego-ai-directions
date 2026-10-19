@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Call Floor Flow</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+body{margin:0}
+a{color:#5CCB9F}a:hover{color:#8FE0BF}
+@keyframes enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes slide{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
+@keyframes bar{0%,100%{transform:scaleY(.2)}50%{transform:scaleY(1)}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes pulse{0%{transform:scale(.8);opacity:.8}100%{transform:scale(2.2);opacity:0}}
+@keyframes blink{50%{opacity:.25}}
+.enter{animation:enter .3s ease-out both}
+.slide{animation:slide .35s ease-out both}
+.bar{transform-origin:bottom;animation:bar .9s ease-in-out infinite}
+.grow{transform-origin:left;animation:grow .7s ease-out both}
+.pulse{animation:pulse 1.6s ease-out infinite}
+.blink{animation:blink 1s steps(2) infinite}
+@media (prefers-reduced-motion:reduce){.enter,.slide,.bar,.grow,.pulse,.blink{animation:none}}
+</style>
+</helmet>
+<div style="min-height: 900px; background: #12181A; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #E4ECEA; display: flex; flex-direction: column">
+  <header style="padding: 12px 24px; background: #0D1213; border-bottom: 1px solid #243034; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap">
+    <div style="display: flex; align-items: center; gap: 14px">
+      <button onClick="{{goHome}}" style="width: 32px; height: 32px; border-radius: 8px; border: 0; background: #3FB68B; color: #0D1213; font: inherit; font-weight: 700; cursor: pointer">N</button>
+      <span style="padding: 6px 12px; border-radius: 6px; background: {{stateBg}}; color: {{stateFg}}; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600">{{stateLabel}}</span>
+      <span style="font-size: 14px; color: #93A3A0">Rica Manalo · MC 7</span>
+    </div>
+    <sc-if value="{{isLive}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; align-items: center; gap: 12px">
+        <span class="blink" style="display: flex; align-items: center; gap: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #F08A72"><span style="width: 8px; height: 8px; border-radius: 50%; background: #E2664B"></span>REC</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-variant-numeric: tabular-nums">{{clock}}</span>
+        <button onClick="{{goResults}}" style="padding: 8px 14px; border-radius: 6px; border: 0; background: #C2452C; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer">End call</button>
+      </div>
+    </sc-if>
+  </header>
+
+  <sc-if value="{{isHome}}" hint-placeholder-val="{{ true }}">
+    <div class="enter" style="flex: 1; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 20px; padding: 24px">
+      <section style="grid-column: span 8; background: #1A2225; border: 1px solid #243034; border-radius: 10px; overflow: hidden; align-self: start">
+        <div style="display: flex; justify-content: space-between; padding: 16px 20px"><h1 style="margin: 0; font-size: 16px; font-weight: 600">Practice queue</h1><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #93A3A0">sorted by TL priority</span></div>
+        <sc-for list="{{queue}}" as="r" hint-placeholder-count="4">
+          <div class="slide" style="display: grid; grid-template-columns: 90px 2fr 1.3fr 60px 96px; gap: 12px; padding: 14px 20px; border-top: 1px solid #243034; align-items: center; background: {{r.bg}}; animation-delay: {{r.d}}">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: {{r.pc}}">{{r.p}}</span>
+            <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600">{{r.s}}</span><span style="font-size: 12px; color: #93A3A0">{{r.why}}</span></div>
+            <span style="font-size: 13px">{{r.b}}</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px">{{r.dpd}}</span>
+            <button onClick="{{goLobby}}" style="padding: 8px 0; border-radius: 6px; border: 0; background: {{r.btn}}; color: {{r.btc}}; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer">Start</button>
+          </div>
+        </sc-for>
+      </section>
+      <section style="grid-column: span 4; background: #1A2225; border: 1px solid #243034; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 10px; align-self: start">
+        <div style="display: flex; justify-content: space-between; align-items: center"><h2 style="margin: 0; font-size: 14px; font-weight: 600">Coaching ticket NEG-41</h2><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 3px 8px; border-radius: 4px; background: #3A2A16; color: #F0B36A">MAJOR</span></div>
+        <span style="font-size: 14px; line-height: 1.5">QA flagged 3 live calls with no partial offered after a hardship claim.</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #93A3A0">QA AI · 16 Oct · Mark Ocampo</span>
+      </section>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isLobby}}" hint-placeholder-val="{{ false }}">
+    <div class="enter" style="flex: 1; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 20px; padding: 24px">
+      <section style="grid-column: span 7; background: #1A2225; border: 1px solid #243034; border-radius: 10px; padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px">
+        <div style="position: relative; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center">
+          <sc-if value="{{notReady}}" hint-placeholder-val="{{ true }}"><div class="pulse" style="position: absolute; inset: 0; border-radius: 50%; border: 2px solid #3FB68B"></div></sc-if>
+          <div style="width: 96px; height: 96px; border-radius: 50%; background: {{dialBg}}; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 26px; color: #0D1213; transition: background .4s">JD</div>
+        </div>
+        <span style="font-size: 20px; font-weight: 600">{{dialText}}</span>
+        <div style="width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 13px">
+          <sc-for list="{{checks}}" as="c" hint-placeholder-count="3"><div class="slide" style="display: flex; justify-content: space-between; animation-delay: {{c.d}}"><span style="color: #93A3A0">{{c.k}}</span><span style="color: {{c.c}}">{{c.v}}</span></div></sc-for>
+        </div>
+        <sc-if value="{{ready}}" hint-placeholder-val="{{ false }}"><button class="enter" onClick="{{goLive}}" style="padding: 12px 28px; border-radius: 6px; border: 0; background: #3FB68B; color: #0D1213; font: inherit; font-size: 15px; font-weight: 700; cursor: pointer">Connect</button></sc-if>
+      </section>
+      <section style="grid-column: span 5; background: #1A2225; border: 1px solid #243034; border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #93A3A0; letter-spacing: 0.06em">ACCOUNT</span>
+        <span style="font-size: 17px; font-weight: 600">Jomar Dizon · Amihan Demo Bank</span>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; font-family: 'IBM Plex Mono', monospace">
+          <div><div style="font-size: 11px; color: #93A3A0">BALANCE</div><div>₱48,250</div></div><div><div style="font-size: 11px; color: #93A3A0">DPD</div><div>62</div></div>
+          <div><div style="font-size: 11px; color: #93A3A0">PTP</div><div>₱12,000</div></div><div><div style="font-size: 11px; color: #93A3A0">DUE</div><div>25 Oct</div></div>
+        </div>
+        <span style="font-size: 14px; line-height: 1.5; color: #B9C6C3">Lost a sideline job. Will ask to move the date.</span>
+      </section>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isLive}}" hint-placeholder-val="{{ false }}">
+    <div class="enter" style="flex: 1; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; padding: 20px 24px">
+      <section style="grid-column: span 7; background: #1A2225; border: 1px solid #243034; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 6px">
+        <sc-for list="{{pts}}" as="p" hint-placeholder-count="5">
+          <div style="display: grid; grid-template-columns: 28px 1fr 56px; gap: 10px; padding: 12px 10px; border-radius: 8px; background: {{p.bg}}; box-shadow: {{p.ring}}; transition: background .3s, box-shadow .3s">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: {{p.nc}}">{{p.n}}</span>
+            <div style="display: flex; flex-direction: column; gap: 8px"><span style="font-size: 14px; font-weight: 600; color: {{p.fg}}; text-decoration: {{p.dec}}">{{p.t}}</span><sc-if value="{{p.now}}" hint-placeholder-val="{{ false }}"><span style="font-size: 18px; line-height: 1.5"><span>{{said}}</span> <span style="color: #6F7F7C">{{rest}}</span></span></sc-if></div>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #5CCB9F; text-align: right">{{p.time}}</span>
+          </div>
+        </sc-for>
+      </section>
+      <section style="grid-column: span 5; background: #1A2225; border: 1px solid #243034; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 14px">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #93A3A0; letter-spacing: 0.06em">LIVE TRANSCRIPT</span>
+        <sc-for list="{{lines}}" as="l" hint-placeholder-count="4"><div class="slide" style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: {{l.c}}">{{l.ts}} {{l.who}}</span><span style="font-size: 13px; line-height: 1.5; color: #D3DDDA">{{l.text}}</span></div></sc-for>
+        <div style="margin-top: auto; display: flex; gap: 2px; align-items: flex-end; height: 32px" aria-hidden="true"><sc-for list="{{wave}}" as="w" hint-placeholder-count="30"><div class="bar" style="flex: 1; border-radius: 1px; background: #3FB68B; height: {{w.h}}; animation-delay: {{w.d}}"></div></sc-for></div>
+      </section>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isResults}}" hint-placeholder-val="{{ false }}">
+    <div class="enter" style="flex: 1; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; padding: 24px; align-content: start">
+      <section style="grid-column: span 4; background: #1A2225; border: 1px solid #243034; border-radius: 10px; padding: 22px; display: flex; flex-direction: column; gap: 16px">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #93A3A0; letter-spacing: 0.06em">SCORE</span>
+        <div style="display: flex; align-items: baseline; gap: 10px"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 64px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1">{{score}}</span><span style="color: #93A3A0">/ 100</span></div>
+        <sc-for list="{{crit}}" as="c" hint-placeholder-count="3"><div style="display: flex; flex-direction: column; gap: 6px"><div style="display: flex; justify-content: space-between; font-size: 13px"><span>{{c.t}}</span><span style="font-family: 'IBM Plex Mono', monospace">{{c.v}}</span></div><div style="height: 6px; border-radius: 3px; background: #243034; overflow: hidden"><div class="grow" style="height: 6px; background: #3FB68B; width: {{c.w}}; animation-delay: {{c.d}}"></div></div></div></sc-for>
+        <sc-if value="{{done}}" hint-placeholder-val="{{ true }}"><div class="enter" style="padding: 10px 12px; border-radius: 6px; background: #17352B; color: #5CCB9F; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600">PASSED · TICKET NEG-41 CLOSED</div></sc-if>
+      </section>
+      <section style="grid-column: span 8; background: #1A2225; border: 1px solid #243034; border-radius: 10px; overflow: hidden">
+        <div style="padding: 16px 20px; display: flex; justify-content: space-between"><h1 style="margin: 0; font-size: 15px; font-weight: 600">Required points</h1><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #93A3A0">5 of 5</span></div>
+        <sc-for list="{{review}}" as="r" hint-placeholder-count="5"><div class="slide" style="display: grid; grid-template-columns: 60px 1fr 2fr; gap: 14px; padding: 12px 20px; border-top: 1px solid #243034; animation-delay: {{r.d}}"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #5CCB9F">{{r.time}}</span><span style="font-size: 14px; font-weight: 600">{{r.t}}</span><span style="font-size: 13px; color: #B9C6C3">{{r.q}}</span></div></sc-for>
+        <div style="padding: 16px 20px; border-top: 1px solid #243034; display: flex; justify-content: space-between; align-items: center; gap: 12px"><span style="font-size: 13px; color: #F0B36A">Offer the split sooner. Hardship came up at 01:36.</span><button onClick="{{goHome}}" style="padding: 9px 16px; border-radius: 6px; border: 0; background: #3FB68B; color: #0D1213; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer">Back to queue</button></div>
+      </section>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.POINTS = [
+      { t: 'Opening and identity check', at: 2 }, { t: 'Restate PTP date and amount', at: 5 }, { t: 'Probe ability to pay', at: 10 },
+      { t: 'Offer partial payment', at: 14 }, { t: 'Recap, new PTP, close', at: 18 }
+    ];
+    this.LINES = [
+      { at: 0, who: 'a', text: 'Magandang hapon po, si Rica po ito ng Amihan Bank. Si Mr. Jomar Dizon po ba ito?' },
+      { at: 2, who: 'd', text: 'Oo, ako nga. Ano yun?' },
+      { at: 3, who: 'a', text: 'I-confirm ko lang po ang ₱12,000 natin sa 25 Oct.' },
+      { at: 6, who: 'd', text: 'Medyo mahirap ngayon. Nawalan ako ng sideline.' },
+      { at: 8, who: 'a', text: 'Naiintindihan ko po. Ano po ang pinagkukunan natin ng pambayad ngayong buwan?' },
+      { at: 11, who: 'd', text: 'Baka kalahati lang kaya ko sa 25.' },
+      { at: 12, who: 'a', text: 'Pwede po nating hatiin: ₱6,000 sa 25 Oct at ₱6,000 sa 8 Nov.' },
+      { at: 15, who: 'd', text: 'Sige, kaya ko yun.' },
+      { at: 16, who: 'a', text: 'Recap po: ₱6,000 sa 25 Oct, ₱6,000 sa 8 Nov. Salamat po, Mr. Dizon.' }
+    ];
+    this.state = { screen: 'home', tick: 0, ready: false, score: 0 };
+  }
+  componentWillUnmount() { this.stop(); }
+  stop() { if (this.iv) { clearInterval(this.iv); this.iv = null; } if (this.to) { clearTimeout(this.to); this.to = null; } }
+  go(screen) {
+    this.stop();
+    this.setState({ screen, tick: 0, ready: false, score: 0 });
+    if (screen === 'lobby') this.to = setTimeout(() => this.setState({ ready: true }), 2200);
+    if (screen === 'live') this.iv = setInterval(() => { const t = this.state.tick + 1; if (t > 20) { this.go('results'); return; } this.setState({ tick: t }); }, 750);
+    if (screen === 'results') this.iv = setInterval(() => { const s = Math.min(84, this.state.score + 2); this.setState({ score: s }); if (s >= 84) this.stop(); }, 25);
+  }
+  renderVals() {
+    const s = this.state, t = s.tick;
+    const fmt = x => String(Math.floor(x / 60)).padStart(2, '0') + ':' + String(x % 60).padStart(2, '0');
+    const pts = this.POINTS.map((p, i) => {
+      const met = t > p.at, now = !met && (i === 0 || t > this.POINTS[i - 1].at);
+      return { ...p, met, now, n: '0' + (i + 1), time: met ? fmt(p.at * 16) : '',
+        bg: now ? '#1E2A2D' : 'transparent', ring: now ? 'inset 0 0 0 1px #3FB68B' : 'none',
+        fg: met ? '#93A3A0' : now ? '#E4ECEA' : '#6F7F7C', dec: met ? 'line-through' : 'none', nc: met || now ? '#5CCB9F' : '#6F7F7C' };
+    });
+    const vis = this.LINES.filter(l => l.at <= t);
+    const lastA = [...vis].reverse().find(l => l.who === 'a') || this.LINES[0];
+    const words = lastA.text.split(' ');
+    const n = Math.min(words.length, (t - lastA.at) * 5 + 4);
+    const scr = s.screen;
+    const label = { home: ['READY TO PRACTICE', '#17352B', '#5CCB9F'], lobby: [s.ready ? 'PARTNER READY' : 'DIALING', '#2A3A2F', '#F0B36A'], live: ['ON CALL', '#17352B', '#5CCB9F'], results: ['WRAP UP', '#243034', '#B9C6C3'] }[scr];
+    const ok = (k, v, d) => ({ k, v, c: '#5CCB9F', d });
+    return {
+      isHome: scr === 'home', isLobby: scr === 'lobby', isLive: scr === 'live', isResults: scr === 'results',
+      ready: s.ready, notReady: !s.ready, done: s.score >= 84,
+      goHome: () => this.go('home'), goLobby: () => this.go('lobby'), goLive: () => this.go('live'), goResults: () => this.go('results'),
+      stateLabel: label[0], stateBg: label[1], stateFg: label[2],
+      queue: [
+        { p: 'P1 TICKET', pc: '#F0B36A', s: 'Affordable Partial Payment', why: 'From coaching ticket', b: 'Amihan', dpd: '62', bg: '#1E2A2D', btn: '#3FB68B', btc: '#0D1213', d: '0s' },
+        { p: 'P2', pc: '#B9C6C3', s: 'Payment Commitment Check-in', why: 'Next in playbook', b: 'Amihan', dpd: '35', bg: '#1A2225', btn: '#243034', btc: '#E4ECEA', d: '.06s' },
+        { p: 'P2', pc: '#B9C6C3', s: 'Refusal to Pay', why: 'New script', b: 'Harbor', dpd: '120', bg: '#1A2225', btn: '#243034', btc: '#E4ECEA', d: '.12s' },
+        { p: 'P3', pc: '#93A3A0', s: 'Settlement Negotiation', why: 'Stretch goal', b: 'Bayanihan', dpd: '180', bg: '#1A2225', btn: '#243034', btc: '#E4ECEA', d: '.18s' }
+      ],
+      dialBg: s.ready ? '#3FB68B' : '#4B5A5E', dialText: s.ready ? 'Jomar D. is on the line' : 'Calling a partner on MC 7',
+      checks: s.ready ? [ok('PARTNER', 'Jomar D.', '0s'), ok('AUDIO', 'OK', '.1s'), ok('RECORDING', 'ARMED', '.2s')] : [{ k: 'PARTNER', v: 'searching', c: '#F0B36A', d: '0s' }],
+      pts, said: words.slice(0, n).join(' '), rest: words.slice(n).join(' '),
+      clock: fmt(t * 16),
+      lines: vis.slice(-5).map(l => ({ ...l, ts: fmt(l.at * 16), who: l.who === 'a' ? 'AGENT' : 'DEBTOR', c: l.who === 'a' ? '#5CCB9F' : '#F0B36A' })),
+      wave: [4,8,14,20,12,24,18,8,16,26,20,10,6,14,22,18,12,8,4,10,16,20,14,8,6,12,18,10,6,4].map((h, i) => ({ h: h + 'px', d: (i * 0.05) + 's' })),
+      score: s.score,
+      crit: [ { t: 'Script accuracy', v: '44/50', w: '88%', d: '.1s' }, { t: 'Voice and tone', v: '24/30', w: '80%', d: '.25s' }, { t: 'Negotiation', v: '16/20', w: '80%', d: '.4s' } ],
+      review: this.POINTS.map((p, i) => ({ t: p.t, time: fmt(p.at * 16), d: (i * 0.08) + 's', q: ['"Si Mr. Jomar Dizon po ba ito?"', '"₱12,000 natin sa 25 Oct"', '"pinagkukunan natin ng pambayad"', '"₱6,000 sa 25 Oct at ₱6,000 sa 8 Nov"', '"Recap po..."'][i] }))
+    };
+  }
+}
+</script>
+</body>
+</html>

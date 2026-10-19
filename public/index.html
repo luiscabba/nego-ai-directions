@@ -24,6 +24,7 @@ h1{margin:0;font-size:32px;font-weight:600;letter-spacing:-.02em}
 .name{font-weight:600;font-size:16px}
 .num{font-family:'Geist Mono',monospace;font-size:12px;color:var(--muted)}
 .tags{font-size:13px;color:var(--muted)}
+.sec{font-size:14px;font-weight:600;letter-spacing:.04em;color:var(--muted);margin:32px 0 14px}
 .open{font-size:13px;font-weight:600;padding:8px 12px;border-radius:8px;border:1px solid var(--line);white-space:nowrap}
 @media (prefers-reduced-motion:reduce){.card{transition:none}}
 </style>
@@ -31,9 +32,12 @@ h1{margin:0;font-size:32px;font-weight:600;letter-spacing:-.02em}
 <body>
 <div class="wrap">
   <header>
-    <div><h1>Nego AI Directions</h1><div class="sub">Same role-play flow in six styles: Home, Lobby, Live, Results.</div></div>
+    <div><h1>Nego AI Directions</h1><div class="sub">Three full app directions, plus the earlier flow explorations.</div></div>
     <span class="num">S.P. Madrid · Oct 2026</span>
   </header>
+  <h2 class="sec">Full apps</h2>
+  <div class="grid" id="apps"></div>
+  <h2 class="sec">Earlier explorations</h2>
   <div class="grid" id="grid"></div>
 </div>
 <script>
@@ -45,6 +49,17 @@ const flows = [
   ['collection-slip', '8', 'Collection Slip', 'Paper slips · stamps · receipt tape'],
   ['game-show', '9', 'Game Show', 'Broadcast HUD · loud type']
 ];
+const apps = [
+  ['app-glass-path', '4+', 'Glass Path', 'Light glass · 9 screens'],
+  ['app-glass-console', '5+', 'Glass Console', 'Dark glass · 9 screens'],
+  ['app-game-show', '9+', 'Game Show', 'Broadcast stage · 9 screens']
+];
+const card = ([slug, n, name, tags]) => `
+  <a class="card" href="flows/${slug}.html">
+    <div class="thumb"><iframe src="flows/${slug}.html" title="${name} preview" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+    <div class="meta"><div><div class="name"><span class="num">${n}</span> ${name}</div><div class="tags">${tags}</div></div><span class="open">Open</span></div>
+  </a>`;
+document.getElementById('apps').innerHTML = apps.map(card).join('');
 const grid = document.getElementById('grid');
 grid.innerHTML = flows.map(([slug, n, name, tags]) => `
   <a class="card" href="flows/${slug}.html">

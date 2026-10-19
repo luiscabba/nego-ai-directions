@@ -14,6 +14,9 @@ FLOWS = [
     ("F5", "glass-console", "5", "Glass Console"),
     ("F6", "collection-slip", "8", "Collection Slip"),
     ("F7", "game-show", "9", "Game Show"),
+    ("A4", "app-glass-path", "4+", "Glass Path App"),
+    ("A5", "app-glass-console", "5+", "Glass Console App"),
+    ("A9", "app-game-show", "9+", "Game Show App"),
 ]
 
 PAGE = """<!doctype html>
@@ -51,13 +54,16 @@ def main():
     (OUT / "vendor").mkdir(exist_ok=True)
     shutil.copy(pathlib.Path(__file__).parent / "node_modules/morphdom/dist/morphdom-umd.min.js", OUT / "vendor/")
     for fid, slug, num, name in FLOWS:
+        if not (SRC / f"{fid}.dc.html").exists():
+            continue
         s = (SRC / f"{fid}.dc.html").read_text()
         xdc = re.search(r"<x-dc>(.*)</x-dc>", s, re.S).group(1)
         helmet = re.search(r"<helmet>(.*?)</helmet>", xdc, re.S).group(1).strip()
         body = re.sub(r"<helmet>.*?</helmet>", "", xdc, flags=re.S).strip()
         logic = re.search(r"<script type=\"text/x-dc\"[^>]*>(.*?)</script>", s, re.S).group(1)
+        group = [f for f in FLOWS if f[1].startswith('app-') == slug.startswith('app-')]
         nav = '<a href="../">All</a>' + "".join(
-            f'<a href="{sl}.html"{" aria-current=\"page\"" if sl == slug else ""}>{n}</a>' for _, sl, n, _ in FLOWS)
+            f'<a href="{sl}.html"{" aria-current=\"page\"" if sl == slug else ""}>{n}</a>' for _, sl, n, _ in group)
         (OUT / "flows" / f"{slug}.html").write_text(
             PAGE.format(title=f"{num} {name}", helmet=helmet, body=body, logic=logic.replace("</script", "<\\/script"), nav=nav))
         print("built", slug)

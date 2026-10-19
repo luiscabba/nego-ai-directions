@@ -85,3 +85,7 @@
   [style*="font-size: 28px; line-height: 1.05"] { font-size: 19px !important; }
   [style*="margin-left: -150px"] { bottom: 84px !important; }
 }
+
+@media (max-width: 760px) {
+  body:has(.gc) .dc-switch { bottom: auto !important; top: 8px !important; left: auto !important; right: 8px !important; }
+}

@@ -17,6 +17,7 @@ FLOWS = [
     ("A4", "app-glass-path", "4+", "Glass Path App"),
     ("A5", "app-glass-console", "5+", "Glass Console App"),
     ("A9", "app-game-show", "9+", "Game Show App"),
+    ("P5", "app-glass-console-polished", "5 Final", "Glass Console Polished"),
 ]
 
 PAGE = """<!doctype html>
@@ -26,7 +27,7 @@ PAGE = """<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title} · Nego AI</title>
 {helmet}
-<link rel="stylesheet" href="../mobile.css">
+{mobile}
 <style>
 .dc-switch{{position:fixed;left:16px;bottom:16px;z-index:50;display:flex;gap:4px;padding:5px;border-radius:99px;background:rgba(15,18,20,.82);backdrop-filter:blur(12px);font:600 12px/1 system-ui,sans-serif}}
 .dc-switch a{{color:#E8ECEA;text-decoration:none;padding:8px 12px;border-radius:99px}}
@@ -65,7 +66,7 @@ def main():
         nav = '<a href="../">All</a>' + "".join(
             f'<a href="{sl}.html"{" aria-current=\"page\"" if sl == slug else ""}>{n}</a>' for _, sl, n, _ in group)
         (OUT / "flows" / f"{slug}.html").write_text(
-            PAGE.format(title=f"{num} {name}", helmet=helmet, body=body, logic=logic.replace("</script", "<\\/script"), nav=nav))
+            PAGE.format(mobile="" if fid.startswith("P") else '<link rel="stylesheet" href="../mobile.css">', title=f"{num} {name}", helmet=helmet, body=body, logic=logic.replace("</script", "<\\/script"), nav=nav))
         print("built", slug)
 
 main()

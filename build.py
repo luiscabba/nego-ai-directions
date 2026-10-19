@@ -23,6 +23,7 @@ PAGE = """<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title} · Nego AI</title>
 {helmet}
+<link rel="stylesheet" href="../mobile.css">
 <style>
 .dc-switch{{position:fixed;left:16px;bottom:16px;z-index:50;display:flex;gap:4px;padding:5px;border-radius:99px;background:rgba(15,18,20,.82);backdrop-filter:blur(12px);font:600 12px/1 system-ui,sans-serif}}
 .dc-switch a{{color:#E8ECEA;text-decoration:none;padding:8px 12px;border-radius:99px}}

@@ -1,5 +1,5 @@
 const {JSDOM}=require('jsdom');const fs=require('fs');
-const dom=new JSDOM(fs.readFileSync('public/flows/app-glass-console-polished.html','utf8'),{runScripts:'outside-only',pretendToBeVisual:true,url:'https://x.test/'});
+const dom=new JSDOM(fs.readFileSync('public/index.html','utf8'),{runScripts:'outside-only',pretendToBeVisual:true,url:'https://x.test/'});
 const w=dom.window; w.scrollTo=()=>{};
 for (const src of ['public/vendor/morphdom-umd.min.js','public/dc-runtime.js']) w.eval(fs.readFileSync(src,'utf8'));
 const inst=w.DCRuntime.mount(w.document.getElementById('app'),w.document.getElementById('tpl'),w.document.getElementById('logic').textContent);

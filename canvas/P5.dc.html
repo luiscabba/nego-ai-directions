@@ -696,7 +696,7 @@ class Component extends DCLogic {
     if (FRAMES[fr]) Object.assign(this.state, FRAMES[fr]);
   }
   componentDidMount() {
-    const site = /\/flows\//.test(location.pathname);
+    const site = !!window.__NEGO_SITE;
     if (site && !this.props.frame) {
       this.onKey = e => { if (e.key === 'd' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) this.demo(); };
       document.addEventListener('keydown', this.onKey);
